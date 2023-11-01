@@ -1,7 +1,5 @@
 const {
   Product,
-  Category,
-  Supplier,
   ProductVarians,
 } = require("../../models/");
 const {
@@ -11,31 +9,19 @@ const {
 module.exports = {
   getList: async (req, res, next) => {
     try {
-      const { page, pageSize, categoryId } = req.query;
-      const pages = page || 1;
-      const limit = pageSize || 10;
-      const skip = (pages - 1) * limit;
-      const conditionFind = { isDeleted: false };
-      if (categoryId) conditionFind.categoryId = categoryId;
-      const result = await Product
+      const result = await ProductVarians
 
         //   .updateMany(
         //     { isDeleted:true },
         //     { $set: { "isDeleted" : false } }
         //  );
-        .find(conditionFind)
-        .populate("category")
-        .populate("supplier")
-        .populate("image")
+        .find()
+        .populate('product')
         .lean()
-        .skip(skip)
-        .limit(limit);
-      const total = await Product.countDocuments(conditionFind);
 
       return res.send(200, {
         message: "Thành công",
         payload: result,
-        total: total,
       });
     } catch (err) {
       return res.send(400, {
@@ -92,34 +78,10 @@ module.exports = {
   getDetail: async (req, res, next) => {
     const { id } = req.params;
     try {
-      // const result = await Product.findOne({ _id: id, isDeleted: false })
-      //   .populate("category")
-      //   .populate("supplier")
-      //   .populate("image");
-      const result= await Product.aggregate().lookup(
-        {
-          from: "productvarians",
-          localField: "_id",
-          foreignField: "productId",
-          as: "productVarians",
-        },
-      ).unwind('productVarians').group(
-        {
-          _id:"$_id",
-          name:{$first:"$name"},
-          discount:{$first:"$discount"},
-          price:{$first:"$productVarians.price"},
-          color:{$sum:1}
-        }
-
-      ).lookup(
-        {
-          from: "productvarians",
-          localField: "_id",
-          foreignField: "productId",
-          as: "productVarians",
-        },
-      )
+      const result = await Product.findOne({ _id: id, isDeleted: false })
+        .populate("category")
+        .populate("supplier")
+        .populate("image");
       if (result) {
         return res.send(200, {
           message: "Thành công",
@@ -136,52 +98,8 @@ module.exports = {
       });
     }
   },
+
   create: async (req, res, next) => {
-    const {
-      name,
-      discount,
-      categoryId,
-      supplierId,
-      description,
-      mediaId,
-      isDeleted,
-    } = req.body;
-    try {
-      // const { color, memory, price, stock, width, height, length, weight } =
-      //   productVarians;
-      // const newVarian = new ProductVarians({
-      //   color,
-      //   memory,
-      //   price,
-      //   stock,
-      //   width,
-      //   height,
-      //   length,
-      //   weight,
-      // });
-      const newRecord = new Product({
-        name,
-        discount,
-        categoryId,
-        supplierId,
-        description,
-        mediaId,
-        isDeleted,
-      });
-      const result = await newRecord.save();
-      // const varianResult = await newVarian.save()
-      return res.status(200).json({
-        mesage: "Thành công",
-        payload: result,
-      });
-    } catch (err) {
-      return res.send(400, {
-        mesage: "Thất bại",
-        error: err,
-      });
-    }
-  },
-  createVarian: async (req, res, next) => {
     const {
       productId,
       color,
@@ -194,23 +112,37 @@ module.exports = {
       weight,
     } = req.body;
     try {
-      const newRecord = new ProductVarians({
-        productId,
-        color,
-        memory,
-        price,
-        stock,
-        width,
-        height,
-        legnth,
-        weight,
+      const exitProduct= await Product.findOne({_id:productId})
+     if(!exitProduct){
+      return res.status(404).json({
+        mesage: "Không tìm thấy ID sản phẩm",
       });
-      const result = await newRecord.save();
-      // const varianResult = await newVarian.save()
-      return res.status(200).json({
-        mesage: "Thành công",
-        payload: result,
+     }
+     const exitVarian = await ProductVarians.findOne({
+      memory:memory,
+      color:color
+     })
+     if(exitVarian){
+      return res.status(404).json({
+        mesage: "Mã sản phẩm này đã tồn tại",
       });
+     }
+     const newRecord = new ProductVarians({
+      productId,
+      color,
+      memory,
+      price,
+      stock,
+      width,
+      height,
+      legnth,
+      weight,
+    });
+    const result = await newRecord.save();
+    return res.status(200).json({
+      mesage: "Thành công",
+      payload: result,
+    });
     } catch (err) {
       return res.send(400, {
         mesage: "Thất bại",

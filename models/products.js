@@ -10,29 +10,15 @@ const productSchema = new Schema(
       maxLength: [50, "Tên sản  phẩm không được vượt quá 50 ký tự"],
       unique: [true, "Tên sản phẩm không được trùng"],
     },
-    name: {
-      type: Object,
-      required: [true, "Tên danh mục không được bỏ trống"],
-    },
-    price: {
-      type: Number,
-      require:[true,"Giá không được để trống"],
-      min:0,
-      default:0
-    },
+
     discount: {
         type: Number,
         min:0,
         max:75,
         default:0
       },
-      stock: {
-        type: Number,
-        min:0,
-        default:0
-      },
       mediaId:{type:Schema.Types.ObjectId,ref:"Media",require:true},
-      categoryId:{type:Schema.Types.ObjectId,maxLength: [50, "Tên sản  phẩm không được vượt quá 50 ký tự"],ref:"Category",require:true},
+      categoryId:{type:Schema.Types.ObjectId,maxLength: [50, "Tên  danh mục không được vượt quá 50 ký tự"],ref:"Category",require:true},
       supplierId:{type : Schema.Types.ObjectId,ref:"Supplier",require:true},
     description:{type:String,maxLength:[3000,"Mô tả không vượt quá 3000 ký tự"]},
     isDeleted: {

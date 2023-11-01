@@ -3,15 +3,14 @@ var router = express.Router();
 const { validateSchema } = require('../../helper');
 const {getDetail,getList,search,create,update,softDelete,createVarian}=require('./controller')
 const checkIdSchema = require('../validationId')
-const {validationSchema,validationVarianSchema} =require('./validation')
+const {validationVarianSchema} =require('./validation')
 
 // GET LIST & CREATE LIST
 router.route('/')
 .get(getList)
-.post(validateSchema(validationSchema),create)
+.post(validateSchema(validationVarianSchema),create)
 // SEARCH LIST
 router.get('/search',search)
-router.post('/varians',validateSchema(validationVarianSchema),createVarian)
 // GET DETAIL UPDATE DELETE
 router.put("/:id",update)
 router.route('/:id')

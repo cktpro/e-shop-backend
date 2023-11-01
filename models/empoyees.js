@@ -30,6 +30,11 @@ const employeeSchema = new Schema(
         maxLength: [50, "Email không được vượt quá 50 ký tự"],
         unique:[true,"Email không được trùng"]
       },
+      password: {
+        type: String,
+        required: [true, "Password không được bỏ trống"],
+        maxLength: [50, "Password không được vượt quá 50 ký tự"],
+      },
       birthday: {
         type: Date,
       },
@@ -44,6 +49,33 @@ const employeeSchema = new Schema(
     timestamps: true,
   }
 );
+employeeSchema.pre("save",async function (next) {
+  try {
+    const salt = await bcrypt.salt(10);
+    const hash = await  bcrypt.hash(this.password, salt);
+    this.password=hash;
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+employeeSchema.pre("findOneAndUpdate",async function (next) {
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(this.getUpdate().password, salt);
+    this.getUpdate().password=hash;
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+employeeSchema.methods.isValidPass = async function(password) {
+  try {
+    return await bcrypt.compare(password, this.password);
+  } catch (err) {
+    throw new Error(err);
+  }
+};
 employeeSchema.virtual('fullName').get(function () {
     return this.firstName+" "+this.lastName;
   });
