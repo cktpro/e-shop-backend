@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
+const bcrypt = require("bcryptjs");
 const mongooseLeanVirtuals = require('mongoose-lean-virtuals');
 
 const employeeSchema = new Schema(
@@ -33,7 +34,7 @@ const employeeSchema = new Schema(
       password: {
         type: String,
         required: [true, "Password không được bỏ trống"],
-        maxLength: [50, "Password không được vượt quá 50 ký tự"],
+        min: [3, "Password quá ngắn"],
       },
       birthday: {
         type: Date,
@@ -51,7 +52,7 @@ const employeeSchema = new Schema(
 );
 employeeSchema.pre("save",async function (next) {
   try {
-    const salt = await bcrypt.salt(10);
+    const salt = await bcrypt.genSalt(10);
     const hash = await  bcrypt.hash(this.password, salt);
     this.password=hash;
     next();
@@ -73,7 +74,7 @@ employeeSchema.methods.isValidPass = async function(password) {
   try {
     return await bcrypt.compare(password, this.password);
   } catch (err) {
-    throw new Error(err);
+    throw new Error(false);
   }
 };
 employeeSchema.virtual('fullName').get(function () {

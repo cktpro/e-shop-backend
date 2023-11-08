@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const {
   Product,
   Category,
@@ -8,6 +9,7 @@ const {
   fuzzySearch,
   // combineObjects,
 } = require("../../helper");
+
 module.exports = {
   getList: async (req, res, next) => {
     try {
@@ -17,19 +19,49 @@ module.exports = {
       const skip = (pages - 1) * limit;
       const conditionFind = { isDeleted: false };
       if (categoryId) conditionFind.categoryId = categoryId;
-      const result = await Product
+      const result = await Product.aggregate().lookup(
+        {
+          from: "productvarians",
+          localField: "_id",
+          foreignField: "productId",
+          as: "productVarians",
+        },
+      ).addFields({
+        price:{$first:"$productVarians.price"},
+        stock:{$sum:"$productVarians.stock"}
+      })
+      .lookup(
+        {
+          from: "categories",
+          localField: "categoryId",
+          foreignField: "_id",
+          as: "category",
+        },
+      )
+      .lookup(
+        {
+          from: "media",
+          localField: "mediaId",
+          foreignField: "_id",
+          as: "image",
+        },
+      )
+      .unwind("category","image")
+      // .sort({price:1})
+        // .skip(skip)
+        // .limit(limit);
 
         //   .updateMany(
         //     { isDeleted:true },
         //     { $set: { "isDeleted" : false } }
         //  );
-        .find(conditionFind)
-        .populate("category")
-        .populate("supplier")
-        .populate("image")
-        .lean()
-        .skip(skip)
-        .limit(limit);
+        // .find(conditionFind)
+        // .populate("category")
+        // .populate("supplier")
+        // .populate("image")
+        // .lean()
+        // .skip(1)
+        // .limit(limit);
       const total = await Product.countDocuments(conditionFind);
 
       return res.send(200, {
@@ -91,35 +123,47 @@ module.exports = {
   },
   getDetail: async (req, res, next) => {
     const { id } = req.params;
+
+    const objId = new mongoose.Types.ObjectId(id);
+    // const obj= new objId(id)
+    // console.log('◀◀◀ obj ▶▶▶',obj);
+
     try {
       // const result = await Product.findOne({ _id: id, isDeleted: false })
       //   .populate("category")
       //   .populate("supplier")
       //   .populate("image");
-      const result= await Product.aggregate().lookup(
+      const result= await Product.aggregate().match({_id:objId}).lookup(
         {
           from: "productvarians",
           localField: "_id",
           foreignField: "productId",
           as: "productVarians",
         },
-      ).unwind('productVarians').group(
-        {
-          _id:"$_id",
-          name:{$first:"$name"},
-          discount:{$first:"$discount"},
-          price:{$first:"$productVarians.price"},
-          color:{$sum:1}
-        }
-
       ).lookup(
         {
-          from: "productvarians",
-          localField: "_id",
-          foreignField: "productId",
-          as: "productVarians",
+          from: "categories",
+          localField: "categoryId",
+          foreignField: "_id",
+          as: "category",
+        },
+      ).lookup(
+        {
+          from: "suppliers",
+          localField: "supplierId",
+          foreignField: "_id",
+          as: "supplier",
         },
       )
+       .lookup(
+        {
+          from: "media",
+          localField: "mediaId",
+          foreignField: "_id",
+          as: "image",
+        },
+      )
+      .unwind('category',"supplier","image")
       if (result) {
         return res.send(200, {
           message: "Thành công",
@@ -181,50 +225,11 @@ module.exports = {
       });
     }
   },
-  createVarian: async (req, res, next) => {
-    const {
-      productId,
-      color,
-      memory,
-      price,
-      stock,
-      width,
-      height,
-      legnth,
-      weight,
-    } = req.body;
-    try {
-      const newRecord = new ProductVarians({
-        productId,
-        color,
-        memory,
-        price,
-        stock,
-        width,
-        height,
-        legnth,
-        weight,
-      });
-      const result = await newRecord.save();
-      // const varianResult = await newVarian.save()
-      return res.status(200).json({
-        mesage: "Thành công",
-        payload: result,
-      });
-    } catch (err) {
-      return res.send(400, {
-        mesage: "Thất bại",
-        error: err,
-      });
-    }
-  },
   update: async (req, res, next) => {
     const { id } = req.params;
     const {
       name,
-      price,
       discount,
-      stock,
       categoryId,
       supplierId,
       description,
@@ -236,9 +241,7 @@ module.exports = {
         id,
         {
           name,
-          price,
           discount,
-          stock,
           categoryId,
           supplierId,
           description,
@@ -247,7 +250,6 @@ module.exports = {
         },
         { new: true }
       );
-      console.log("◀◀◀ a ▶▶▶");
       if (result) {
         return res.send({
           code: 200,

@@ -27,6 +27,7 @@ const productVarianSchema = new Schema(
       min: 0,
       default: 0,
     },
+    mediaId:{type:Schema.Types.ObjectId,ref:"Media",require:true},
     width: {
       type: Number,
       min: 0,

@@ -11,7 +11,6 @@ router.route('/')
 .post(validateSchema(validationSchema),create)
 // SEARCH LIST
 router.get('/search',search)
-router.post('/varians',validateSchema(validationVarianSchema),createVarian)
 // GET DETAIL UPDATE DELETE
 router.put("/:id",update)
 router.route('/:id')
