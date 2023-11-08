@@ -12,8 +12,14 @@ const passportVerifyToken = new JwtStrategy(
     secretOrKey: jwtSettings.SECRET,
   },
   async (payload, done) => {
-    
     try {
+      if(payload.role==="USER"){
+        const user= await Customer.findOne({
+          _id: payload._id,
+          isDeleted: false,
+        }).select('-password');
+        if(user)return done(null,user)
+      }
       const user = await Employee.findOne({
         _id: payload._id,
         isDeleted: false,

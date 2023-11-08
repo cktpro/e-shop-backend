@@ -1,10 +1,10 @@
-const { Customer } = require("../../models");
+const { Customer, Address } = require("../../models");
 const { fuzzySearch } = require("../../helper");
 const { isError } = require("util");
 module.exports = {
   getList: async (req, res, next) => {
     try {
-      const result = await Customer.find({ isDeleted: false });
+      const result = await Customer.find({ isDeleted: false }).populate('address').select('-password');
       if (result) {
         return res.send({
           code: 200,
@@ -32,7 +32,6 @@ module.exports = {
           conditionFind.$expr = {$or:[{firstName:fuzzySearch(name)},{lastName:fuzzySearch(name)}]};
         }
       }
-      console.log('◀◀◀ conditionFind ▶▶▶',conditionFind);
       
       const result = await Customer.find(conditionFind);
       
@@ -58,8 +57,7 @@ module.exports = {
   getDetail: async (req, res, next) => {
     const { id } = req.params;
     try {
-      const result = await Customer.findOne({ _id: id, isDeleted: false });
-      console.log("◀◀◀ result ▶▶▶", result);
+      const result = await Customer.findOne({ _id: id, isDeleted: false }).populate('address');
       if (result) {
         return res.send({
           code: 200,
@@ -75,7 +73,7 @@ module.exports = {
       return res.send({
         code: 400,
         mesage: "Thất bại",
-        error: isError,
+        error: err,
       });
     }
   },
@@ -84,7 +82,6 @@ module.exports = {
       firstName,
       lastName,
       phoneNumber,
-      address,
       email,
       password,
       birthday,
@@ -95,7 +92,6 @@ module.exports = {
         firstName,
         lastName,
         phoneNumber,
-        address,
         email,
         password,
         birthday,
@@ -110,10 +106,11 @@ module.exports = {
         });
       }
       return res.send({
-        code: 400,
+        code: 401,
         mesage: "Thất bại",
       });
     } catch (err) {
+      console.log('◀◀◀ err ▶▶▶',err);
       return res.send(400, {
         mesage: "Thất bại",
         error: err,
@@ -170,6 +167,115 @@ module.exports = {
     const { id } = req.params;
     try {
       const result = await Customer.findByIdAndUpdate(
+        id,
+        { isDeleted: true },
+        { new: true }
+      );
+      if (result) {
+        return res.send({
+          code: 200,
+          mesage: "Thành công xóa",
+        });
+      }
+      return res.send({
+        code: 404,
+        mesage: "Không tìm thấy",
+      });
+    } catch (err) {
+      return res.send({
+        code: 400,
+        mesage: "Thất bại",
+        error: err,
+      });
+    }
+  },
+  // Address CRUD
+  get_address: async (req, res, next) => {
+    const { id } = req.params;
+    try {
+      const result = await Address.find(
+        { isDeleted: false},
+      );
+      if (result) {
+        return res.send({
+          code: 200,
+          mesage: "Success",
+          payload:result
+        });
+      }
+      return res.send({
+        code: 404,
+        mesage: "Not found",
+      });
+    } catch (err) {
+      return res.send({
+        code: 400,
+        mesage: "Error",
+        error: err,
+      });
+    }
+  },
+  create_address: async (req, res, next) => {
+    try {
+      const {customerId,provinceId,provinceName,districtId,districtName,wardId,wardName,address}=req.body
+      const exitUser= await Customer.findOne({_id:customerId,isDeleted:false})
+      if (!exitUser) {
+        return res.send({
+          code: 400,
+          mesage: "Không tìm thấy thông tin người dùng ",
+          
+        });
+      }
+      const newRecord= new Address({
+        customerId,provinceId,provinceName,districtId,districtName,wardId,wardName,address
+      })
+      const result= await newRecord.save()
+      return res.send({
+      code: 200,
+      mesage: 'Thành công',
+      payload: result,
+      });
+    } catch (err) {
+      return res.send({
+        code: 400,
+        mesage: "Thất bại",
+        error: err,
+      });
+    }
+  },
+  update_address: async (req, res, next) => {
+    const { id } = req.params;
+    const {provinceId,provinceName,districtId,districtName,wardId,wardName,address,isDeleted}=req.body
+    try {
+      
+      const result = await Address.findByIdAndUpdate(
+        id,
+        {provinceId,provinceName,districtId,districtName,wardId,wardName,address,isDeleted},
+        { new: true }
+      );
+      if (!result) {
+        return res.send({
+          code: 400,
+          mesage: "Fail to update",
+        });
+      }
+      return res.send({
+        code: 200,
+        mesage: "Success update",
+        payload:result
+      });
+    } catch (err) {
+      return res.send({
+        code: 400,
+        mesage: "Error",
+        error: err,
+      });
+    }
+  },
+  delete_address: async (req, res, next) => {
+    const { id } = req.params;
+    try {
+      const result = await Address.findByIdAndUpdate(
         id,
         { isDeleted: true },
         { new: true }

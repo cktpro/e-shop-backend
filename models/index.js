@@ -7,6 +7,7 @@ const Order = require("./orders");
 const Media = require('./media');
 const Cart =require('./carts')
 const ProductVarians=require('./productVarians')
+const Address=require('./address')
 
 module.exports = {
   Category,
@@ -17,5 +18,6 @@ module.exports = {
   Product,
   Supplier,
   Cart,
-  ProductVarians
+  ProductVarians,
+  Address
 };

@@ -19,12 +19,12 @@ const customerSchema = new Schema(
       type: String,
       maxLength: [50, "Phone number không được vượt quá 50 ký tự"],
     },
-    address: {
-      type: String,
-      required: [true, "Address không được bỏ trống"],
-      maxLength: [500, "Address không được vượt quá 500 ký tự"],
-      unique: [true, "Address không được trùng"],
-    },
+    // address: {
+    //   type: String,
+    //   required: [true, "Address không được bỏ trống 000"],
+    //   maxLength: [500, "Address không được vượt quá 500 ký tự"],
+    //   unique: [true, "Address không được trùng"],
+    // },
     email: {
       type: String,
       required: [true, "Email không được bỏ trống"],
@@ -52,7 +52,7 @@ const customerSchema = new Schema(
 );
 customerSchema.pre("save",async function (next) {
   try {
-    const salt = await bcrypt.salt(10);
+    const salt = await bcrypt.genSalt(10);
     const hash = await  bcrypt.hash(this.password, salt);
     this.password=hash;
     next();
@@ -85,6 +85,11 @@ customerSchema.virtual("Age").get(function () {
 });
 // Virtual with Populate
 
+customerSchema.virtual('address', {
+    ref: 'address',
+    localField: '_id',
+    foreignField: 'customerId',
+  });
 // Config
 customerSchema.set("toJSON", { virtuals: true });
 customerSchema.set("toObject", { virtuals: true });
