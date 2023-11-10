@@ -46,7 +46,7 @@ module.exports = {
           as: "image",
         },
       )
-      .unwind("category","image")
+      .unwind("category")
       // .sort({price:1})
         // .skip(skip)
         // .limit(limit);

@@ -1,12 +1,12 @@
 var express = require('express');
 var router = express.Router();
-const { validateSchema } = require('../../helper');
+const { validateSchema } = require('../../../helper');
 const {login,getMe, checkRefreshToken}=require('./controller')
 const passport = require('passport');
 const {validationLoginSchema,validationRefreshTokenSchema} =require('./validation')
-const {validationCreateSchema} = require('../customers/validation')
-const {create} = require('../customers/controller')
-const {Authorization} =require('../../helper/jwtHelper')
+const {validationCreateSchema} = require('../../customers/validation')
+const {create} = require('../../customers/controller')
+const {Authorization} =require('../../../helper/jwtHelper')
 // LOGIN
 router.route('/login')
   .post(

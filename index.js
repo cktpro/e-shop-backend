@@ -20,7 +20,8 @@ var questionRouter = require("./routes/questions/router");
 var authRouter = require("./routes/auth/router");
 var mediaRouter = require("./routes/media/router");
 var productVariansRouter=require("./routes/productVarian/router");
-var userAuth=require("./routes/user_auth/router");
+var userAuth=require("./routes/user/auth/router");
+var cartRouter=require("./routes/user/cart/router")
 
 const {
   passportVerifyToken,
@@ -75,6 +76,8 @@ app.use("/auth", authRouter);
 app.use("/media", mediaRouter);
 app.use("/varians", productVariansRouter);
 app.use("/user", userAuth);
+app.use("/cart", cartRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

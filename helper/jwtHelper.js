@@ -24,7 +24,7 @@ const generateToken = (user) => {
 const generateRefreshToken = (id) => {
   const expiresIn = '30d';
 
-  return JWT.sign({ id,role }, jwtSettings.SECRET, { expiresIn })
+  return JWT.sign({ id }, jwtSettings.SECRET, { expiresIn })
 };
 const Authorization =()=>{
     return passport.authenticate('jwt', { session: false })

@@ -16,11 +16,11 @@ module.exports = {
         //     { $set: { "isDeleted" : false } }
         //  );
         .find()
-        .populate('product')
-        .lean()
+        
+
 
       return res.send(200, {
-        message: "Thành công",
+        message: "Thành côngss",
         payload: result,
       });
     } catch (err) {

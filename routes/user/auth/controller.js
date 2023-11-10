@@ -1,11 +1,11 @@
-const { Customer, Employee } = require("../../models");
+const { Customer, Employee } = require("../../../models");
 const bcrypt = require("bcryptjs");
 const {
   generateToken,
   generateRefreshToken,
-} = require("../../helper/jwtHelper");
+} = require("../../../helper/jwtHelper");
 const JWT = require("jsonwebtoken");
-const jwtSetting = require("../../constants/jwtSetting");
+const jwtSetting = require("../../../constants/jwtSetting");
 module.exports = {
   login: async (req, res, next) => {
     const { email, password } = req.body;
