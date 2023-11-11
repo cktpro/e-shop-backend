@@ -101,12 +101,14 @@ module.exports = {
 
   getMe: async (req, res, next) => {
     try {
+      const result = await Customer.findOne({ _id: req.user.id, isDeleted: false }).populate('address');
       return res.send({
         code: 200,
         mesage: "Thành công",
-        payload: req.user,
+        payload: result,
       });
     } catch (err) {
+      console.log('◀◀◀ err ▶▶▶',err);
       return res.status(500).json({
         code: 500,
         mesage: "Thất bại",
