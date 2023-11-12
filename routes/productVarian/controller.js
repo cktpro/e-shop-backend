@@ -108,7 +108,7 @@ module.exports = {
       stock,
       width,
       height,
-      legnth,
+      length,
       weight,
     } = req.body;
     try {
@@ -135,7 +135,7 @@ module.exports = {
       stock,
       width,
       height,
-      legnth,
+      length,
       weight,
     });
     const result = await newRecord.save();

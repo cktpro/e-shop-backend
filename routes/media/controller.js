@@ -32,12 +32,11 @@ module.exports = {
   upload_single: (req, res, next) => {
     const { objid } = req.params;
     console.log(
-      "◀◀◀  ▶▶▶",
       process.env.R2_ENDPOINT,
       process.env.R2_ACCESS_KEY,
       process.env.R2_SECRET_ACCESS_KEY
     );
-    upload.single("image")(req, res, async (err) => {
+    upload.single("file")(req, res, async (err) => {
       try {
         const S3 = new S3Client({
           region: "auto",
@@ -47,7 +46,7 @@ module.exports = {
             secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
           },
         });
-
+        console.log('◀◀◀ req.file ▶▶▶',req.file);
         const fileName = toSafeFileName(req.file.originalname);
         await S3.send(
           new PutObjectCommand({
