@@ -19,7 +19,7 @@ module.exports = {
       const skip = (pages - 1) * limit;
       const conditionFind = { isDeleted: false };
       if (categoryId) conditionFind.categoryId = categoryId;
-      const result = await Product.find(conditionFind ).skip(skip).limit(limit)
+      const result = await Product.find(conditionFind ).populate('image').populate('category').populate("supplier").skip(skip).limit(limit)
       const total = await Product.countDocuments(conditionFind);
 
       return res.send(200, {
@@ -199,6 +199,12 @@ module.exports = {
     const { id } = req.params;
     const {
       name,
+      price,
+      stock,
+      width,
+      height,
+      length,
+      weight,
       discount,
       categoryId,
       supplierId,
@@ -211,6 +217,12 @@ module.exports = {
         id,
         {
           name,
+          price,
+          stock,
+          width,
+          height,
+          length,
+          weight,
           discount,
           categoryId,
           supplierId,
