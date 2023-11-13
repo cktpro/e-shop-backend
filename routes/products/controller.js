@@ -4,6 +4,7 @@ const {
   Category,
   Supplier,
   ProductVarians,
+  ProductItem,
 } = require("../../models/");
 const {
   fuzzySearch,
@@ -133,37 +134,53 @@ module.exports = {
       //   .populate("category")
       //   .populate("supplier")
       //   .populate("image");
-      const result= await Product.aggregate().match({_id:objId}).lookup(
-        {
-          from: "productvarians",
+      const result= await ProductItem.aggregate().match({_id:objId}).lookup({
+        from: "productvarians",
           localField: "_id",
-          foreignField: "productId",
-          as: "productVarians",
-        },
-      ).lookup(
+          foreignField: "productItemId",
+          as: "varian",
+      })
+      .unwind("varian")
+      .lookup(
         {
-          from: "categories",
-          localField: "categoryId",
-          foreignField: "_id",
-          as: "category",
-        },
-      ).lookup(
-        {
-          from: "suppliers",
-          localField: "supplierId",
-          foreignField: "_id",
-          as: "supplier",
-        },
+          from: "varians",
+          localField: "valueOption._id",
+          foreignField: "varianOptionId",
+          as: "varianDetail",
+
+        }
       )
-       .lookup(
-        {
-          from: "media",
-          localField: "mediaId",
-          foreignField: "_id",
-          as: "image",
-        },
-      )
-      .unwind('category',"supplier","image")
+      // .lookup(
+      //   {
+      //     from: "productvarians",
+      //     localField: "_id",
+      //     foreignField: "productId",
+      //     as: "productVarians",
+      //   },
+      // ).lookup(
+      //   {
+      //     from: "categories",
+      //     localField: "categoryId",
+      //     foreignField: "_id",
+      //     as: "category",
+      //   },
+      // ).lookup(
+      //   {
+      //     from: "suppliers",
+      //     localField: "supplierId",
+      //     foreignField: "_id",
+      //     as: "supplier",
+      //   },
+      // )
+      //  .lookup(
+      //   {
+      //     from: "media",
+      //     localField: "mediaId",
+      //     foreignField: "_id",
+      //     as: "image",
+      //   },
+      // )
+      // .unwind('category',"supplier","image")
       if (result) {
         return res.send(200, {
           message: "Thành công",

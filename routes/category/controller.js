@@ -1,4 +1,4 @@
-const { Category } = require("../../models");
+const { Category, Varian } = require("../../models");
 const { fuzzySearch } = require("../../helper");
 const { isError } = require("util");
 module.exports = {
@@ -168,6 +168,25 @@ module.exports = {
     } catch (err) {
       return res.send(400, {
         message: "Thất bại",
+        error: err,
+      });
+    }
+  },
+  createVarian: async (req, res, next) => {
+    const{categoryId,name,valueOption} =req.body
+    try {
+      const newRecord= new Varian({
+        categoryId,name,valueOption
+      })
+      const result = await newRecord.save()
+
+      res.send(200, {
+        mesage: "Thành công",
+        payload: result,
+      });
+    } catch (err) {
+      res.send(400, {
+        mesage: "Thất bại",
         error: err,
       });
     }

@@ -1,7 +1,4 @@
-const {
-  Product,
-  ProductVarians,
-} = require("../../models/");
+const { Product, ProductVarian, ProductItem } = require("../../models/");
 const {
   fuzzySearch,
   // combineObjects,
@@ -15,9 +12,7 @@ module.exports = {
         //     { isDeleted:true },
         //     { $set: { "isDeleted" : false } }
         //  );
-        .find()
-        
-
+        .find();
 
       return res.send(200, {
         message: "Thành côngss",
@@ -100,49 +95,25 @@ module.exports = {
   },
 
   create: async (req, res, next) => {
-    const {
-      productId,
-      color,
-      memory,
-      price,
-      stock,
-      width,
-      height,
-      length,
-      weight,
-    } = req.body;
+    const { productId, SKU, price, stock } = req.body;
     try {
-      const exitProduct= await Product.findOne({_id:productId})
-     if(!exitProduct){
-      return res.status(404).json({
-        mesage: "Không tìm thấy ID sản phẩm",
+      const exitProduct = await Product.findOne({ _id: productId });
+      if (!exitProduct) {
+        return res.status(404).json({
+          mesage: "Không tìm thấy ID sản phẩm",
+        });
+      }
+      const newRecord = new ProductItem({
+        productId,
+        SKU,
+        price,
+        stock,
       });
-     }
-     const exitVarian = await ProductVarians.findOne({
-      memory:memory,
-      color:color
-     })
-     if(exitVarian){
-      return res.status(404).json({
-        mesage: "Mã sản phẩm này đã tồn tại",
+      const result = await newRecord.save();
+      return res.status(200).json({
+        mesage: "Thành công",
+        payload: result,
       });
-     }
-     const newRecord = new ProductVarians({
-      productId,
-      color,
-      memory,
-      price,
-      stock,
-      width,
-      height,
-      length,
-      weight,
-    });
-    const result = await newRecord.save();
-    return res.status(200).json({
-      mesage: "Thành công",
-      payload: result,
-    });
     } catch (err) {
       return res.send(400, {
         mesage: "Thất bại",
@@ -214,6 +185,29 @@ module.exports = {
         message: "Thất bại",
       });
     } catch (err) {
+      return res.send({
+        code: 400,
+        message: "Thất bại",
+        error: err,
+      });
+    }
+  },
+  create_varian: async (req, res, next) => {
+    console.log('◀◀◀ a ▶▶▶');
+    const { productItemId, varianOptionId } = req.body;
+    try {
+      const newRecord = new ProductVarian({
+        productItemId,
+        varianOptionId,
+      });
+      const result = await newRecord.save();
+      return res.send({
+        code: 200,
+        mesage: "Thành công",
+        payload: result,
+      });
+    } catch (err) {
+      console.log('◀◀◀ err ▶▶▶',err);
       return res.send({
         code: 400,
         message: "Thất bại",
