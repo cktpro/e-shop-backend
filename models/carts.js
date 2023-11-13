@@ -3,7 +3,6 @@ const { Schema, model } = mongoose;
 const cartDetailSchema = new Schema(
   {
     productId: { type: Schema.Types.ObjectId, ref: "Product", require: true },
-    varianId: { type: Schema.Types.ObjectId, ref: "ProductVarians", require: true },
     quantity: { type: Number, require: true, min: 0 },
   },
   {

@@ -8,11 +8,6 @@ const validationCreateSchema = yup.object().shape({
           .test("validationProductID", "ID sai định dạng", (value) => {
             return ObjectId.isValid(value);
           }),
-        varianId: yup
-          .string()
-          .test("validationProductID", "ID sai định dạng", (value) => {
-            return ObjectId.isValid(value);
-          }),
         quantity: yup.number().required().min(0),
 
 
@@ -22,11 +17,6 @@ const validationCreateSchema = yup.object().shape({
 })
 const validationUpdateSchema = yup.object().shape({
   body: yup.object({
-        varianId: yup
-          .string()
-          .test("validationProductID", "ID sai định dạng", (value) => {
-            return ObjectId.isValid(value);
-          }),
         quantity: yup.number().required().min(0),
 
 

@@ -46,7 +46,6 @@ module.exports = {
             secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
           },
         });
-        console.log('◀◀◀ req.file ▶▶▶',req.file);
         const fileName = toSafeFileName(req.file.originalname);
         await S3.send(
           new PutObjectCommand({
@@ -57,7 +56,6 @@ module.exports = {
           })
         );
 
-        console.log("««««« req.file »»»»»", req.file);
 
         const url = `${process.env.R2_URL}/${fileName}`;
 

@@ -3,7 +3,7 @@ var router = express.Router();
 const { validateSchema } = require("../../../helper");
 const {
   getList,
-  search,
+  // search,
   create,
   update,
   softDelete,
@@ -21,7 +21,7 @@ router
   .put(Authorization(),validateSchema(validationUpdateSchema),update)
 router.delete("/:id",Authorization(),validateSchema(checkIdSchema),softDelete)
 // SEARCH LIST
-router.get("/search", search);
+// router.get("/search", search);
 // GET DETAIL UPDATE DELETE
 // router
 //   .route("/:id")

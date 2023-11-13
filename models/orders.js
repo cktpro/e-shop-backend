@@ -90,7 +90,7 @@ const orderSchema = new Schema(
     },
     shippingAddress: {
       type: String,
-      required: [true,"Địa chỉ giao hàng không được để trống"],
+      required: [true,"Shipping address is required"],
       max: 500,
     },
     customerId: {

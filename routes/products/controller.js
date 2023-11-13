@@ -19,49 +19,7 @@ module.exports = {
       const skip = (pages - 1) * limit;
       const conditionFind = { isDeleted: false };
       if (categoryId) conditionFind.categoryId = categoryId;
-      const result = await Product.aggregate().lookup(
-        {
-          from: "productvarians",
-          localField: "_id",
-          foreignField: "productId",
-          as: "productVarians",
-        },
-      ).addFields({
-        price:{$first:"$productVarians.price"},
-        stock:{$sum:"$productVarians.stock"}
-      })
-      .lookup(
-        {
-          from: "categories",
-          localField: "categoryId",
-          foreignField: "_id",
-          as: "category",
-        },
-      )
-      .lookup(
-        {
-          from: "media",
-          localField: "mediaId",
-          foreignField: "_id",
-          as: "image",
-        },
-      )
-      .unwind("category")
-      // .sort({price:1})
-        // .skip(skip)
-        // .limit(limit);
-
-        //   .updateMany(
-        //     { isDeleted:true },
-        //     { $set: { "isDeleted" : false } }
-        //  );
-        // .find(conditionFind)
-        // .populate("category")
-        // .populate("supplier")
-        // .populate("image")
-        // .lean()
-        // .skip(1)
-        // .limit(limit);
+      const result = await Product.find(conditionFind ).skip(skip).limit(limit)
       const total = await Product.countDocuments(conditionFind);
 
       return res.send(200, {
@@ -183,6 +141,12 @@ module.exports = {
   create: async (req, res, next) => {
     const {
       name,
+      price,
+      stock,
+      width,
+      height,
+      length,
+      weight,
       discount,
       categoryId,
       supplierId,
@@ -205,6 +169,12 @@ module.exports = {
       // });
       const newRecord = new Product({
         name,
+        price,
+        stock,
+        width,
+        height,
+        length,
+        weight,
         discount,
         categoryId,
         supplierId,

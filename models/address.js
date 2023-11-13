@@ -7,12 +7,12 @@ const addressSchema = new Schema(
     customerId:{type : Schema.Types.ObjectId,ref:"Customer",require:true},
     provinceId: {
       type: String,
-      required: [true, "provinceId không được bỏ trống"],
-      maxLength: [50, "provinceId không được vượt quá 50 ký tự"],
+      required: [true, "provinceId is requied"],
+      maxLength: [50, "provinceId must not exceed 50 characters"],
     },
     provinceName: {
       type: String,
-      required:[true,"province name không được bỏ trống"]
+      required:[true,"province name is requied"]
     },
     // address: {
     //   type: String,
@@ -22,25 +22,25 @@ const addressSchema = new Schema(
     // },
     districtId: {
       type: String,
-      required: [true, "districtId không được bỏ trống"],
-      maxLength: [50, "districtId không được vượt quá 50 ký tự"],
+      required: [true, "districtId is requied"],
+      maxLength: [50, "districtId must not exceed 50 characters"],
     },
     districtName: {
       type: String,
-      required: [true, "districtName không được bỏ trống"],
+      required: [true, "districtName is requied"],
     },
     wardId: {
     type: String,
-    required: [true, "wardId không được bỏ trống"],
-    maxLength:[50,"wardId không vượt quá 50 ký tự"]
+    required: [true, "wardId is requied"],
+    maxLength:[50,"wardId must not exceed 50 characters"]
   },
   wardName: {
     type: String,
-    required: [true, "wardId không được bỏ trống"],
+    required: [true, "wardId is requied"],
   },
   address: {
     type: String,
-    required: [true, "address không được bỏ trống"],
+    required: [true, "address is requied"],
   },
     isDeleted: {
       type: Boolean,

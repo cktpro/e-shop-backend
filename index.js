@@ -19,7 +19,6 @@ var orderRouter = require("./routes/orders/router");
 var questionRouter = require("./routes/questions/router");
 var authRouter = require("./routes/auth/router");
 var mediaRouter = require("./routes/media/router");
-var productVariansRouter=require("./routes/productVarian/router");
 var userAuth=require("./routes/user/auth/router");
 var cartRouter=require("./routes/user/cart/router")
 
@@ -66,7 +65,7 @@ passport.use(new BasicStrategy(
 
 app.use("/", indexRouter);
 app.use("/products", productsRouter);
-app.use("/category", categoryRouter);
+app.use("/categories", categoryRouter);
 app.use("/suppliers", suppliersRouter);
 app.use("/customers", customersRouter);
 app.use("/employees", employeesRouter);
@@ -74,7 +73,6 @@ app.use("/orders", orderRouter);
 app.use("/questions", questionRouter);
 app.use("/auth", authRouter);
 app.use("/media", mediaRouter);
-app.use("/varians", productVariansRouter);
 app.use("/user", userAuth);
 app.use("/cart", cartRouter);
 

@@ -19,28 +19,23 @@ module.exports = {
         //   foreignField:"_id"
         // })
         .unwind("product")
-        .lookup({
-          from: "productvarians",
-          as: "product.varian",
-          localField: "product.varianId",
-          foreignField: "_id",
-        })
-        .lookup({
-          from: "products",
-          as: "product.productDetail",
-          localField: "product.productId",
-          foreignField: "_id",
-        })
-        .unwind("product.varian", "product.productDetail")
         .lookup(
           {
-            from: "media",
-            as: "product.image",
-            localField: "product.productDetail.mediaId",
-            foreignField: "_id",
+          from:"products",
+          as:"productDetail",
+          localField:"product.productId",
+          foreignField:"_id"
           }
-        )
-        .unwind('product.image')
+        ).unwind("productDetail")
+        .lookup(
+          {
+          from:"media",
+          as:"image",
+          localField:"productDetail.mediaId",
+          foreignField:"_id"
+          }
+        ).unwind("image")
+        
       // .find({customerId:id});
       if (result) {
         return res.send({
@@ -60,54 +55,54 @@ module.exports = {
       });
     }
   },
-  search: async (req, res, next) => {
-    try {
-      const { name } = req.query;
-      const conditionFind = { isDeleted: false };
-      if (name) conditionFind.name = fuzzySearch(name);
-      const result = Order.find(conditionFind);
-      if (result) {
-        return res.send({
-          code: 200,
-          mesage: "Thành công",
-          payload: result,
-        });
-      }
-      return res.send({
-        code: 404,
-        mesage: "Không tìm thấy",
-      });
-    } catch (error) {
-      return res.send({
-        code: 400,
-        mesage: "Thất bại",
-        error: error,
-      });
-    }
-  },
-  getDetail: async (req, res, next) => {
-    const { id } = req.params;
-    try {
-      const result = await Order.findOne({ _id: id });
-      if (result) {
-        return res.send({
-          code: 200,
-          mesage: "Thành công",
-          payload: result,
-        });
-      }
-      return res.send({
-        code: 404,
-        mesage: "Thất bại",
-      });
-    } catch (err) {
-      return res.send({
-        code: 400,
-        mesage: "Thất bại",
-        error: err,
-      });
-    }
-  },
+  // search: async (req, res, next) => {
+  //   try {
+  //     const { name } = req.query;
+  //     const conditionFind = { isDeleted: false };
+  //     if (name) conditionFind.name = fuzzySearch(name);
+  //     const result = Order.find(conditionFind);
+  //     if (result) {
+  //       return res.send({
+  //         code: 200,
+  //         mesage: "Thành công",
+  //         payload: result,
+  //       });
+  //     }
+  //     return res.send({
+  //       code: 404,
+  //       mesage: "Không tìm thấy",
+  //     });
+  //   } catch (error) {
+  //     return res.send({
+  //       code: 400,
+  //       mesage: "Thất bại",
+  //       error: error,
+  //     });
+  //   }
+  // },
+  // getDetail: async (req, res, next) => {
+  //   const { id } = req.params;
+  //   try {
+  //     const result = await Order.findOne({ _id: id });
+  //     if (result) {
+  //       return res.send({
+  //         code: 200,
+  //         mesage: "Thành công",
+  //         payload: result,
+  //       });
+  //     }
+  //     return res.send({
+  //       code: 404,
+  //       mesage: "Thất bại",
+  //     });
+  //   } catch (err) {
+  //     return res.send({
+  //       code: 400,
+  //       mesage: "Thất bại",
+  //       error: err,
+  //     });
+  //   }
+  // },
   create: async function (req, res, next) {
     try {
       const { id } = req.user;
@@ -159,7 +154,7 @@ module.exports = {
       //     );
       // });
       const exitItem = await Cart.findOne({
-        "product.varianId": data.varianId,
+        "product.productId": data.productId,
       });
       if (!exitItem) {
         await Cart.updateOne(
@@ -169,12 +164,12 @@ module.exports = {
         );
       } else {
         await Cart.updateOne(
-          { customerId: id, "product.varianId": data.varianId },
+          { customerId: id, "product.productId": data.productId },
           { $inc: { "product.$.quantity": data.quantity } }
         );
       }
 
-      const final = await Cart.find();
+      const final = await Cart.find({customerId:id});
       return res.send({
         code: 203,
         message: "Tạo thành công",
@@ -187,20 +182,20 @@ module.exports = {
   },
   update: async (req, res, next) => {
     const userId = req.user.id;
-    const { varianId, quantity } = req.body;
+    const { productId, quantity } = req.body;
     try {
       const result = await Cart.updateOne(
-        { customerId: userId, "product.varianId": varianId },
+        { customerId: userId, "product.productId": productId },
         { $set: { "product.$.quantity": quantity } },
         { upsert: true }
       );
 
-      const final = await Cart.find();
+      const final = await Cart.find({customerId:userId});
 
       return res.send({
         code: 200,
         payload: final,
-        message: "Cập nhật trạng thái thành công",
+        message: "Cập nhật giỏ hàng thành công",
       });
     } catch (err) {
       return res.status(500).json({ code: 500, error: err });
