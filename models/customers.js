@@ -7,34 +7,34 @@ const customerSchema = new Schema(
   {
     firstName: {
       type: String,
-      required: [true, "First name không được bỏ trống"],
-      maxLength: [50, "First name không được vượt quá 50 ký tự"],
+      required: [true, "First name is required"],
+      maxLength: [50, "First name must not exceed 50 characters"],
     },
     lastName: {
       type: String,
       required: [true, "Last name không được bỏ trống"],
-      maxLength: [50, "Last name không được vượt quá 50 ký tự"],
+      maxLength: [50, "First name must not exceed 50 characters"],
     },
     phoneNumber: {
       type: String,
-      maxLength: [50, "Phone number không được vượt quá 50 ký tự"],
+      maxLength: [50, "Phone number must not exceed 50 characters"],
     },
-    address: {
-      type: String,
-      required: [true, "Address không được bỏ trống"],
-      maxLength: [500, "Address không được vượt quá 500 ký tự"],
-      unique: [true, "Address không được trùng"],
-    },
+    // address: {
+    //   type: String,
+    //   required: [true, "Address không được bỏ trống 000"],
+    //   maxLength: [500, "Address không được vượt quá 500 ký tự"],
+    //   unique: [true, "Address không được trùng"],
+    // },
     email: {
       type: String,
-      required: [true, "Email không được bỏ trống"],
-      maxLength: [50, "Email không được vượt quá 50 ký tự"],
-      unique: [true, "Email không được trùng"],
+      required: [true, "Email is required"],
+      maxLength: [50, "Email must not exceed 50 characters"],
+      unique: [true, "Email is unique"],
     },
     password: {
       type: String,
-      required: [true, "Password không được bỏ trống"],
-      maxLength: [50, "Password không được vượt quá 50 ký tự"],
+      required: [true, "Password is required"],
+      min: [3, "Password must be greater than 3 characters"],
     },
     birthday: {
       type: Date,
@@ -52,7 +52,7 @@ const customerSchema = new Schema(
 );
 customerSchema.pre("save",async function (next) {
   try {
-    const salt = await bcrypt.salt(10);
+    const salt = await bcrypt.genSalt(10);
     const hash = await  bcrypt.hash(this.password, salt);
     this.password=hash;
     next();
@@ -85,6 +85,11 @@ customerSchema.virtual("Age").get(function () {
 });
 // Virtual with Populate
 
+customerSchema.virtual('address', {
+    ref: 'address',
+    localField: '_id',
+    foreignField: 'customerId',
+  });
 // Config
 customerSchema.set("toJSON", { virtuals: true });
 customerSchema.set("toObject", { virtuals: true });

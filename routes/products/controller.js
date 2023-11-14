@@ -1,36 +1,31 @@
-const { Product, Category, Supplier } = require("../../models/");
+const mongoose = require('mongoose');
+const {
+  Product,
+  Category,
+  Supplier,
+  ProductVarians,
+} = require("../../models/");
 const {
   fuzzySearch,
   // combineObjects,
 } = require("../../helper");
+
 module.exports = {
   getList: async (req, res, next) => {
     try {
-      const{page,pageSize,categoryId}=req.query
-      const pages = page || 1
-      const limit = pageSize || 10
-      const skip= ((pages - 1) * limit)
-      const conditionFind={isDeleted:false}
-      if(categoryId) conditionFind.categoryId=categoryId
-      const result = await Product
-     
-    //   .updateMany(
-    //     { isDeleted:true },
-    //     { $set: { "isDeleted" : false } }
-    //  );
-      .find(conditionFind)
-        .populate("category")
-        .populate("supplier")
-        .populate("image")
-        .lean()
-        .skip(skip)
-        .limit(limit);
-      const total=await Product.countDocuments(conditionFind)
+      const { page, pageSize, categoryId } = req.query;
+      const pages = page || 1;
+      const limit = pageSize || 10;
+      const skip = (pages - 1) * limit;
+      const conditionFind = { isDeleted: false };
+      if (categoryId) conditionFind.categoryId = categoryId;
+      const result = await Product.find(conditionFind ).populate('image').populate('category').populate("supplier").skip(skip).limit(limit)
+      const total = await Product.countDocuments(conditionFind);
 
       return res.send(200, {
         message: "Thành công",
         payload: result,
-        total:total
+        total: total,
       });
     } catch (err) {
       return res.send(400, {
@@ -65,9 +60,9 @@ module.exports = {
         conditionFind.price = { $lte: parseFloat(priceEnd) };
       }
       const result = await Product.find(conditionFind)
-      .populate("category")
-      .populate("supplier")
-      .lean();
+        .populate("category")
+        .populate("supplier")
+        .lean();
       if (result) {
         return res.send(200, {
           mesage: "Thành công",
@@ -86,8 +81,47 @@ module.exports = {
   },
   getDetail: async (req, res, next) => {
     const { id } = req.params;
+
+    const objId = new mongoose.Types.ObjectId(id);
+    // const obj= new objId(id)
+    // console.log('◀◀◀ obj ▶▶▶',obj);
+
     try {
-      const result = await Product.findOne({ _id: id,isDeleted:false }).populate('category').populate('supplier').populate('image');
+      // const result = await Product.findOne({ _id: id, isDeleted: false })
+      //   .populate("category")
+      //   .populate("supplier")
+      //   .populate("image");
+      const result= await Product.aggregate().match({_id:objId}).lookup(
+        {
+          from: "productvarians",
+          localField: "_id",
+          foreignField: "productId",
+          as: "productVarians",
+        },
+      ).lookup(
+        {
+          from: "categories",
+          localField: "categoryId",
+          foreignField: "_id",
+          as: "category",
+        },
+      ).lookup(
+        {
+          from: "suppliers",
+          localField: "supplierId",
+          foreignField: "_id",
+          as: "supplier",
+        },
+      )
+       .lookup(
+        {
+          from: "media",
+          localField: "mediaId",
+          foreignField: "_id",
+          as: "image",
+        },
+      )
+      .unwind('category',"supplier","image")
       if (result) {
         return res.send(200, {
           message: "Thành công",
@@ -108,8 +142,12 @@ module.exports = {
     const {
       name,
       price,
-      discount,
       stock,
+      width,
+      height,
+      length,
+      weight,
+      discount,
       categoryId,
       supplierId,
       description,
@@ -117,11 +155,27 @@ module.exports = {
       isDeleted,
     } = req.body;
     try {
+      // const { color, memory, price, stock, width, height, length, weight } =
+      //   productVarians;
+      // const newVarian = new ProductVarians({
+      //   color,
+      //   memory,
+      //   price,
+      //   stock,
+      //   width,
+      //   height,
+      //   length,
+      //   weight,
+      // });
       const newRecord = new Product({
         name,
         price,
-        discount,
         stock,
+        width,
+        height,
+        length,
+        weight,
+        discount,
         categoryId,
         supplierId,
         description,
@@ -129,7 +183,7 @@ module.exports = {
         isDeleted,
       });
       const result = await newRecord.save();
-      console.log("◀◀◀ result ▶▶▶", result);
+      // const varianResult = await newVarian.save()
       return res.status(200).json({
         mesage: "Thành công",
         payload: result,
@@ -146,8 +200,12 @@ module.exports = {
     const {
       name,
       price,
-      discount,
       stock,
+      width,
+      height,
+      length,
+      weight,
+      discount,
       categoryId,
       supplierId,
       description,
@@ -160,8 +218,12 @@ module.exports = {
         {
           name,
           price,
-          discount,
           stock,
+          width,
+          height,
+          length,
+          weight,
+          discount,
           categoryId,
           supplierId,
           description,
@@ -170,18 +232,17 @@ module.exports = {
         },
         { new: true }
       );
-      console.log('◀◀◀ a ▶▶▶');
-      if(result){
-        return res.send ({
-          code:200,
-          message:"Thành công",
-          payload:result
-        })
+      if (result) {
+        return res.send({
+          code: 200,
+          message: "Thành công",
+          payload: result,
+        });
       }
-      return res.send ({
-        code:400,
-        message:"Thất bại",
-      })
+      return res.send({
+        code: 400,
+        message: "Thất bại",
+      });
     } catch (err) {
       return res.send({ code: 400, message: "Thất bại", error: err });
     }
@@ -189,23 +250,27 @@ module.exports = {
   softDelete: async (req, res, next) => {
     const { id } = req.params;
     try {
-      const result =await Product.findByIdAndUpdate(id,{isDeleted:true},{new:true})
-      if(result){
+      const result = await Product.findByIdAndUpdate(
+        id,
+        { isDeleted: true },
+        { new: true }
+      );
+      if (result) {
         return res.send({
-          code:200,
-          message:"Thành công xóa" 
-        })
+          code: 200,
+          message: "Thành công xóa",
+        });
       }
       return res.send({
-        code:400,
-        message:"Thất bại"
-      })
+        code: 400,
+        message: "Thất bại",
+      });
     } catch (err) {
       return res.send({
-        code:400,
-        message:"Thất bại",
-        error:err
-      })
+        code: 400,
+        message: "Thất bại",
+        error: err,
+      });
     }
   },
   // hardDelete: async(req,res,next)=>{

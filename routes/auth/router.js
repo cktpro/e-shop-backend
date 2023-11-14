@@ -9,7 +9,6 @@ const {Authorization} =require('../../helper/jwtHelper')
 router.route('/login')
   .post(
     validateSchema(validationLoginSchema),
-    passport.authenticate('local', { session: false }),
     checkLogin,
   );
   router.route('/basic')

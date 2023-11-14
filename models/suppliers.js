@@ -5,20 +5,20 @@ const supplierSchema = new Schema(
     {
       name: {
         type: String,
-        required: [true, "Tên danh mục không được bỏ trống"],
-        maxLength: [100, "Tên danh mục không được vượt quá 100 ký tự"],
+        required: [true, "Name is required"],
+        maxLength: [100, "name must not exceed 100 characters"],
         required: true,
       },
       email: {
         type: String,
-        maxLength: [50, "Email không được vượt quá 50 ký tự"],
-        required: [true,"Email không được bỏ trống"],
-        unique:[true,"Email không được trùng"]
+        maxLength: [50, "Email must not exceed 50 characters"],
+        required: [true,"Email is required"],
+        unique:[true,"Email is unique"]
       },
       phoneNumber: {
         type: String,
-        maxLength: [50, "PhoneNumber không được vượt quá 50 ký tự"],
-        unique:[true,"Số điệnt thoại không được trùng"]
+        maxLength: [50, "PhoneNumber must not exceed 50 characters"],
+        unique:[true,"Phone number thoại is unique"]
       },
       isDeleted: {
         type: Boolean,
@@ -27,7 +27,7 @@ const supplierSchema = new Schema(
       },
       address: {
         type: String,
-        maxLength:[500,"Địa chỉ không vượt quá 500 kí tự"],
+        maxLength:[500,"Address must not exceed 500 characters"],
         required: true,
       },
     },

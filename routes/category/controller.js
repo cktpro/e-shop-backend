@@ -1,4 +1,4 @@
-const { Category } = require("../../models");
+const { Category, CategorySpec } = require("../../models");
 const { fuzzySearch } = require("../../helper");
 const { isError } = require("util");
 module.exports = {
@@ -9,7 +9,7 @@ module.exports = {
      const skip= ((pages - 1) * limit)
      const conditionFind={isDeleted:false}
     try {
-      const result = await Category.find(conditionFind)
+      const result = await Category.find(conditionFind).populate('image')
         .skip(skip)
         .limit(limit);
       const total=await Category.countDocuments(conditionFind)
@@ -71,8 +71,8 @@ module.exports = {
   },
   create: async (req, res, next) => {
     try {
-      const { name, description } = req.body;
-      const newRecord = new Category({ name, description });
+      const { name, description,imageId } = req.body;
+      const newRecord = new Category({ name, description,imageId  });
       let result = await newRecord.save();
       console.log("◀◀◀ result ▶▶▶", result);
       if (result) {
@@ -116,6 +116,8 @@ module.exports = {
       });
     }
   },
+  // Spec
+
   // updatePatch: async (req, res, next) => {
   //   const { id } = req.params;
   //   const { name, price, description, discount } = req.body;
@@ -154,8 +156,8 @@ module.exports = {
     try {
       const result = await Category.findByIdAndUpdate(
         id,
-        { isDeleted: true },
-        { new: true }
+        {isDeleted:true},
+        {new:true}
       );
       if (result) {
         return res.send(200, {

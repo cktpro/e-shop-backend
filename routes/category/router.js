@@ -3,8 +3,7 @@ var router = express.Router();
 const { validateSchema } = require('../../helper');
 const {getDetail,getList,search,create,update,softDelete}=require('./controller')
 const checkIdSchema = require('../validationId')
-const {validationCreateSchema} =require('./validation')
-
+const {validationCreateSchema,validationSpecSchema} =require('./validation')
 // GET LIST & CREATE LIST
 router.route('/')
 .get(getList)

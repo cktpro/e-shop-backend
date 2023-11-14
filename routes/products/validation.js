@@ -7,7 +7,11 @@ const validationSchema = yup.object().shape({
       .required("Tên không được bỏ trống"),
     price: yup
       .number()
-      .min(0, "Giá không thể âm")
+      .integer()
+      .required(({ path }) => `${path.split(".")[1]} không được bỏ trống`),
+    stock: yup
+      .number()
+      .min(0, "Stock không thể âm")
       .integer()
       .required(({ path }) => `${path.split(".")[1]} không được bỏ trống`),
     discount: yup
@@ -16,25 +20,36 @@ const validationSchema = yup.object().shape({
       .max(75, "Giảm giá quá lớn")
       .integer()
       .required(({ path }) => `${path.split(".")[1]} không được bỏ trống`),
-    stock: yup
-      .number()
-      .min(0, "Số lượng không hợp lệ")
-      .integer()
-      .required(({ path }) => `${path.split(".")[1]} không được bỏ trống`),
     description: yup
       .string()
       .max(3000, "Mô tả quá dài")
       .required(({ path }) => `${path.split(".")[1]} không được bỏ trống`),
-      categoryId: yup
+    categoryId: yup
       .string()
       .required(({ path }) => `${path.split(".")[1]} không được bỏ trống`),
-      supplierId: yup
+    supplierId: yup
       .string()
       .required(({ path }) => `${path.split(".")[1]} không được bỏ trống`),
-    isDeleted: yup
-      .boolean()
+    width: yup
+      .number()
+      .min(0, ({ path }) => `${path.split(".")[1]} must be greater than 0`)
+      .required(({ path }) => `${path.split(".")[1]} is required`),
+    height: yup
+      .number()
+      .min(0, ({ path }) => `${path.split(".")[1]} must be greater than 0`)
+      .required(({ path }) => `${path.split(".")[1]} is required`),
+    length: yup
+      .number()
+      .min(0, ({ path }) => `${path.split(".")[1]} must be greater than 0`)
+      .required(({ path }) => `${path.split(".")[1]} is required`),
+    weight: yup
+      .number()
+      .min(0, ({ path }) => `${path.split(".")[1]} must be greater than 0`)
+      .required(({ path }) => `${path.split(".")[1]} is required`),
+    isDeleted: yup.boolean(),
   }),
 });
+
 module.exports = {
-  validationSchema
+  validationSchema,
 };

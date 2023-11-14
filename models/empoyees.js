@@ -1,34 +1,40 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
+const bcrypt = require("bcryptjs");
 const mongooseLeanVirtuals = require('mongoose-lean-virtuals');
 
 const employeeSchema = new Schema(
   {
     firstName: {
       type: String,
-      required: [true, "First name không được bỏ trống"],
-      maxLength: [50, "First name không được vượt quá 50 ký tự"],
+      required: [true, "First name Last name is required"],
+      maxLength: [50, "First name must not exceed 50 characters"],
     },
     lastName: {
         type: String,
-        required: [true, "Last name không được bỏ trống"],
-        maxLength: [50, "Last name không được vượt quá 50 ký tự"],
+        required: [true, "Last name is required"],
+        maxLength: [50, "Last name must not exceed 50 characters"],
       },
       phoneNumber: {
         type: String,
-        maxLength: [50, "Phone number không được vượt quá 50 ký tự"],
+        maxLength: [50, "Phone number must not exceed 50 characters"],
       },
       address: {
         type: String,
-        required: [true, "Address không được bỏ trống"],
-        maxLength: [500, "Address không được vượt quá 500 ký tự"],
-        unique:[true,"Address không được trùng"]
+        required: [true, "Address is required"],
+        maxLength: [500, "Address must not exceed 500 characters"],
+        unique:[true,"Address is unique"]
       },
       email: {
         type: String,
-        required: [true, "Email không được bỏ trống"],
-        maxLength: [50, "Email không được vượt quá 50 ký tự"],
-        unique:[true,"Email không được trùng"]
+        required: [true, "Email is required"],
+        maxLength: [50, "Email must not exceed 50 characters"],
+        unique:[true,"Email is unique"]
+      },
+      password: {
+        type: String,
+        required: [true, "Password is required"],
+        min: [3, "Password quá ngắn"],
       },
       birthday: {
         type: Date,
@@ -44,6 +50,33 @@ const employeeSchema = new Schema(
     timestamps: true,
   }
 );
+employeeSchema.pre("save",async function (next) {
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hash = await  bcrypt.hash(this.password, salt);
+    this.password=hash;
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+employeeSchema.pre("findOneAndUpdate",async function (next) {
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(this.getUpdate().password, salt);
+    this.getUpdate().password=hash;
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+employeeSchema.methods.isValidPass = async function(password) {
+  try {
+    return await bcrypt.compare(password, this.password);
+  } catch (err) {
+    throw new Error(false);
+  }
+};
 employeeSchema.virtual('fullName').get(function () {
     return this.firstName+" "+this.lastName;
   });

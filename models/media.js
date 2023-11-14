@@ -3,10 +3,11 @@ const { Schema, model } = mongoose;
 
 const mediaSchema = new Schema(
   {
+    productId:{ type: Schema.Types.ObjectId, ref: 'products'},
     name: { type: String, required: true },
     size: { type: Number, require: true },
     location: { type: String, required: true },
-    employeeId: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
+    employeeId: { type: Schema.Types.ObjectId, ref: 'employees'},
   },
   {
     versionKey: false,

@@ -79,6 +79,7 @@ module.exports = {
       phoneNumber,
       address,
       email,
+      password,
       birthday,
       isDeleted,
     } = req.body;
@@ -89,20 +90,26 @@ module.exports = {
         phoneNumber,
         address,
         email,
+        password,
         birthday,
         isDeleted,
       });
       const result = await newRecord.save();
-      if (result) {
-        return res.send({
-          code: 200,
-          mesage: "Thành công",
-          payload: result,
-        });
-      }
+      // if (result) {
+      //   return res.send({
+      //     code: 200,
+      //     mesage: "Thành công",
+      //     payload: result,
+      //   });
+      // }
+      // return res.send({
+      //   code: 400,
+      //   mesage: "Thất bại",
+      // });
       return res.send({
-        code: 400,
-        mesage: "Thất bại",
+        code: 200,
+        mesage: "Thành công",
+        payload: result,
       });
     } catch (err) {
       return res.send(400, {
@@ -119,6 +126,7 @@ module.exports = {
       phoneNumber,
       address,
       email,
+      password,
       birthday,
       isDeleted,
     } = req.body;
@@ -131,6 +139,7 @@ module.exports = {
           phoneNumber,
           address,
           email,
+          password,
           birthday,
           isDeleted,
         },
