@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const {
   Product,
   Category,
@@ -19,7 +19,12 @@ module.exports = {
       const skip = (pages - 1) * limit;
       const conditionFind = { isDeleted: false };
       if (categoryId) conditionFind.categoryId = categoryId;
-      const result = await Product.find(conditionFind ).populate('image').populate('category').populate("supplier").skip(skip).limit(limit)
+      const result = await Product.find(conditionFind)
+        .populate("image")
+        .populate("category")
+        .populate("supplier")
+        .skip(skip)
+        .limit(limit);
       const total = await Product.countDocuments(conditionFind);
 
       return res.send(200, {
@@ -91,37 +96,33 @@ module.exports = {
       //   .populate("category")
       //   .populate("supplier")
       //   .populate("image");
-      const result= await Product.aggregate().match({_id:objId}).lookup(
-        {
+      const result = await Product.aggregate()
+        .match({ _id: objId })
+        .lookup({
           from: "productvarians",
           localField: "_id",
           foreignField: "productId",
           as: "productVarians",
-        },
-      ).lookup(
-        {
+        })
+        .lookup({
           from: "categories",
           localField: "categoryId",
           foreignField: "_id",
           as: "category",
-        },
-      ).lookup(
-        {
+        })
+        .lookup({
           from: "suppliers",
           localField: "supplierId",
           foreignField: "_id",
           as: "supplier",
-        },
-      )
-       .lookup(
-        {
+        })
+        .lookup({
           from: "media",
           localField: "mediaId",
           foreignField: "_id",
           as: "image",
-        },
-      )
-      .unwind('category',"supplier","image")
+        })
+        .unwind("category", "supplier", "image");
       if (result) {
         return res.send(200, {
           message: "Thành công",
@@ -151,7 +152,8 @@ module.exports = {
       categoryId,
       supplierId,
       description,
-      mediaId,
+      coverImg,
+      imageList,
       isDeleted,
     } = req.body;
     try {
@@ -179,7 +181,8 @@ module.exports = {
         categoryId,
         supplierId,
         description,
-        mediaId,
+        coverImg,
+        imageList,
         isDeleted,
       });
       const result = await newRecord.save();

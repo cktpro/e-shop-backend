@@ -169,7 +169,7 @@ module.exports = {
         );
       }
 
-      const final = await Cart.find({customerId:id});
+      const final = await Cart.findOne({customerId:id});
       return res.send({
         code: 203,
         message: "Tạo thành công",
