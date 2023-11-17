@@ -26,12 +26,13 @@ module.exports = {
           localField:"product.productId",
           foreignField:"_id"
           }
-        ).unwind("productDetail")
+        )
+        .unwind("productDetail")
         .lookup(
           {
           from:"media",
           as:"image",
-          localField:"productDetail.mediaId",
+          localField:"productDetail.coverImg",
           foreignField:"_id"
           }
         ).unwind("image")
