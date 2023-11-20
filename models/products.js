@@ -1,7 +1,19 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 const mongooseLeanVirtuals = require("mongoose-lean-virtuals");
-
+const imageListSchema = new Schema(
+  {
+    mediaId:{ type: Schema.Types.ObjectId, ref: "Media", require: true },
+    location: { type: String, required: true },
+  },
+  {
+    versionKey: false,
+  }
+)
+// Virtuals in console.log()
+imageListSchema.set("toObject", { virtuals: true });
+// Virtuals in JSON
+imageListSchema.set("toJSON", { virtuals: true });
 const productSchema = new Schema(
   {
     name: {
@@ -31,7 +43,8 @@ const productSchema = new Schema(
     height: {type: Number,min: 0,default: 0,},
     length: {type: Number,min: 0,default: 0,},
     weight: {type: Number,min: 0,default: 0,},
-    mediaId: { type: Schema.Types.ObjectId, ref: "Media", require: true },
+    coverImg: { type: Schema.Types.ObjectId, ref: "Media", require: true },
+    imageList:[imageListSchema],
     categoryId: {
       type: Schema.Types.ObjectId,
       maxLength: [50, "CategoryId must not exceed 50 characters"],
@@ -64,7 +77,7 @@ productSchema.virtual("category", {
 });
 productSchema.virtual("image", {
   ref: "Media",
-  localField: "mediaId",
+  localField: "coverImg",
   foreignField: "_id",
   justOne: true,
 });

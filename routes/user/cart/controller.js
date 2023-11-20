@@ -26,12 +26,13 @@ module.exports = {
           localField:"product.productId",
           foreignField:"_id"
           }
-        ).unwind("productDetail")
+        )
+        .unwind("productDetail")
         .lookup(
           {
           from:"media",
           as:"image",
-          localField:"productDetail.mediaId",
+          localField:"productDetail.coverImg",
           foreignField:"_id"
           }
         ).unwind("image")
@@ -169,7 +170,7 @@ module.exports = {
         );
       }
 
-      const final = await Cart.find({customerId:id});
+      const final = await Cart.findOne({customerId:id});
       return res.send({
         code: 203,
         message: "Tạo thành công",

@@ -3,6 +3,7 @@ const passport =require('passport')
 const jwtSettings = require('../constants/jwtSetting');
 
 const generateToken = (user) => {
+  // const expiresIn = '24h';
   const expiresIn = '24h';
   const algorithm = 'HS256'; 
 
