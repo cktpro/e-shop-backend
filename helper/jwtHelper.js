@@ -1,15 +1,16 @@
 const JWT = require('jsonwebtoken');
-const passport =require('passport')
+
 const jwtSettings = require('../constants/jwtSetting');
 
 const generateToken = (user) => {
-  // const expiresIn = '24h';
-  const expiresIn = '24h';
-  const algorithm = 'HS256'; 
+  const expiresIn = '1h';
+  // const expiresIn = '10s';
+
+  const algorithm = 'HS256';
 
   return JWT.sign(
     {
-      iat: Math.floor(Date.now() / 1000),
+      iat: Math.floor(Date.now() / 1000), //thời điểm tạo token
       // email: user.email,
       // name: user.firstName,
       ...user,
@@ -24,14 +25,12 @@ const generateToken = (user) => {
 
 const generateRefreshToken = (id) => {
   const expiresIn = '30d';
+  // const expiresIn = '15s';
 
   return JWT.sign({ id }, jwtSettings.SECRET, { expiresIn })
 };
-const Authorization =()=>{
-    return passport.authenticate('jwt', { session: false })
-}
+
 module.exports = {
   generateToken,
   generateRefreshToken,
-  Authorization
 };

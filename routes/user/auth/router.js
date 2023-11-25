@@ -31,7 +31,6 @@ router.route('/login')
 
 router.route('/get_profile')
   .get(
-    Authorization(),
     getMe,
   );
 

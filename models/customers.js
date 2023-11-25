@@ -18,6 +18,7 @@ const customerSchema = new Schema(
     phoneNumber: {
       type: String,
       maxLength: [50, "Phone number must not exceed 50 characters"],
+      unique: [true, "phoneNumber is unique"],
     },
     // address: {
     //   type: String,
@@ -38,11 +39,16 @@ const customerSchema = new Schema(
     },
     birthday: {
       type: Date,
+      default:new Date("1990/03/01")
     },
     isDeleted: {
       type: Boolean,
       default: false,
       required: true,
+    },
+    isGoogle: {
+      type: Boolean,
+      default: false,
     },
   },
   {

@@ -7,19 +7,20 @@ const {
   create,
   update,
   softDelete,
+  deleteCart
 } = require("./controller");
 const checkIdSchema = require("../../validationId");
 const { validationCreateSchema,validationUpdateSchema } = require("./validation");
-const {Authorization} =require("../../../helper/jwtHelper")
 
 // GET LIST & CREATE LIST
 router
   .route("/")
-  .get(Authorization(),getList)
+  .get(getList)
   // .post(validateSchema(validationCreateSchema), create);
-  .post(Authorization(),validateSchema(validationCreateSchema), create)
-  .put(Authorization(),validateSchema(validationUpdateSchema),update)
-router.delete("/:id",Authorization(),validateSchema(checkIdSchema),softDelete)
+  .post(validateSchema(validationCreateSchema), create)
+  .put(validateSchema(validationUpdateSchema),update)
+  .delete(deleteCart)
+router.delete("/:id",validateSchema(checkIdSchema),softDelete)
 // SEARCH LIST
 // router.get("/search", search);
 // GET DETAIL UPDATE DELETE

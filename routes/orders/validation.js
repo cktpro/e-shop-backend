@@ -37,10 +37,12 @@ const validationCreateSchema = yup.object().shape({
       }),
     status: yup
       .string()
-      .oneOf(["WAITING", "COMPLETED", "CANCELED", "REJECTED", "DELIVERING"])
+      .oneOf(["WAITING", "PAID", "COMPLETED", "CANCELED", "REJECTED", "DELIVERING"])
       .required(({ path }) => `${path.split(".")[1]} không được bỏ trống`),
 
     description: yup.string(),
+    shippingFee:yup.number().required().min(0),
+    totalPrice:yup.number().required().min(0),
     shippingAddress: yup
       .string()
       .max(500, ({ path }) => `${path.split(".")[1]} quá dài`)
@@ -55,10 +57,10 @@ const validationCreateSchema = yup.object().shape({
         return ObjectId.isValid(value);
       }),
     employeeId: yup
-      .string()
-      .test("validationCustomerID", "ID sai định dạng", (value) => {
-        return ObjectId.isValid(value);
-      }),
+      .string(),
+      // .test("validationCustomerID", "ID sai định dạng", (value) => {
+      //   return ObjectId.isValid(value);
+      // }),
     orderDetails: yup.array().of(
       yup.object().shape({
         productId: yup
