@@ -56,7 +56,18 @@ const orderSchema = new Schema(
         message: `Shipped date: {VALUE} is invalid!`,
       },
     },
-
+    shippingFee:{
+      type:Number,
+      min:0,
+      required:true,
+      
+    },
+    totalPrice:{
+      type:Number,
+      min:0,
+      required:true,
+      
+    },
     paymentType: {
       type: String,
       required: true,
@@ -76,7 +87,7 @@ const orderSchema = new Schema(
     status: {
       type: String,
       required: true,
-      enum: ["WAITING", "COMPLETED", "CANCELED", "REJECTED", "DELIVERING"],
+      enum: ["WAITING", "PAID", "COMPLETED", "CANCELED", "REJECTED", "DELIVERING"],
       default: "WAITING",
       // validate: {
       //   validator: (value) => {

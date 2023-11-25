@@ -76,7 +76,7 @@ module.exports = {
       const data = req.body;
 
       const { customerId, employeeId, orderDetails } = data;
-
+console.log('««««« empoyeeId »»»»»', employeeId);
       const getCustomer = Customer.findOne({
         _id: customerId,
         isDeleted: false,
@@ -93,9 +93,9 @@ module.exports = {
       ]);
 
       const errors = [];
-      if (!customer || customer.isDelete)
+      if ( !customer || customer.isDelete)
         errors.push('Khách hàng không tồn tại');
-      if (!employee || employee.isDelete)
+      if (employeeId && (!employee || employee.isDelete))
         errors.push('Nhân viên không tồn tại');
 
       await asyncForEach(orderDetails, async (item) => {

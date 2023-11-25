@@ -205,13 +205,43 @@ module.exports = {
 
   softDelete: async (req, res, next) => {
     const userId = req.user.id;
-    const varianId = req.params.id;
+    const productId = req.params.id;
     try {
       const result = await Cart.updateOne(
         { customerId: userId },
-        { $pull: { product: { varianId: varianId } } }
+        { $pull: { product: { productId: productId } } }
       );
       console.log("◀◀◀ result ▶▶▶", result);
+      const result2 = await Cart.find();
+      //   id,
+      //   { isDeleted: true },
+      //   { new: true }
+      // );
+      // if (result) {
+      //   return res.send({
+      //     code: 200,
+      //     mesage: "Thành công xóa",
+      //   });
+      // }
+      return res.send({
+        code: 200,
+        mesage: "Thành công",
+        payload: result2,
+      });
+    } catch (err) {
+      return res.send({
+        code: 400,
+        mesage: "Thất bại",
+        error: err,
+      });
+    }
+  },
+  deleteCart: async (req, res, next) => {
+    const userId = req.user.id;
+    try {
+      await Cart.findOneAndDelete(
+        { customerId: userId },
+      );
       const result2 = await Cart.find();
       //   id,
       //   { isDeleted: true },

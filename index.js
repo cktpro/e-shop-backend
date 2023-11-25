@@ -19,14 +19,23 @@ var orderRouter = require("./routes/orders/router");
 var questionRouter = require("./routes/questions/router");
 var authRouter = require("./routes/auth/router");
 var mediaRouter = require("./routes/media/router");
-var userAuth=require("./routes/user/auth/router");
-var cartRouter=require("./routes/user/cart/router")
+var userAuth = require("./routes/user/auth/router");
+var cartRouter = require("./routes/user/cart/router")
+
+const authCustomersRouter = require('./routes/authCustomer/router');
+const vnPayRouter = require('./routes/vnPay/router');
 
 const {
-  passportVerifyToken,
-  passportVerifyAccount,
-  passportConfigBasic,
-} = require("./middlewares/passport");
+  passportVerifyTokenAdmin,
+  passportVerifyAccountAdmin,
+  // passportConfigBasic,
+} = require('./middlewares/passportAdmin');
+
+const {
+  passportVerifyTokenUser,
+  passportVerifyAccountUser,
+  // passportConfigBasic,
+} = require('./middlewares/passportUser');
 
 var app = express();
 
@@ -47,14 +56,12 @@ app.use(
   })
 );
 mongoose.connect(process.env.URI);
-passport.use(passportVerifyToken);
-passport.use(passportVerifyAccount);
 // passport.use(passportConfigBasic);
 passport.use(new BasicStrategy(
-  function(username, password, done) {
-    
+  function (username, password, done) {
+
     User.findOne({ username: username }, function (err, user) {
-      
+
       // if (err) { console.log('◀◀◀ username ▶▶▶',username) }
       // if (!user) { return done(null, false); }
       // if (!user.validPassword(password)) { return done(null, false); }
@@ -62,6 +69,12 @@ passport.use(new BasicStrategy(
     });
   }
 ));
+
+passport.use('jwtAdmin', passportVerifyTokenAdmin);
+passport.use('localAdmin', passportVerifyAccountAdmin);
+
+passport.use('jwtUser', passportVerifyTokenUser);
+passport.use('localUser', passportVerifyAccountUser);
 
 app.use("/", indexRouter);
 app.use("/products", productsRouter);
@@ -74,8 +87,10 @@ app.use("/questions", questionRouter);
 app.use("/auth", authRouter);
 app.use("/media", mediaRouter);
 app.use("/user", userAuth);
-app.use("/cart", cartRouter);
+app.use("/cart", passport.authenticate('jwtUser', { session: false }), cartRouter);
 
+app.use('/authCustomers', authCustomersRouter);
+app.use('/vnPay', passport.authenticate('jwtUser', { session: false }), vnPayRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -117,6 +117,38 @@ module.exports = {
       });
     }
   },
+
+  createGoogle: async (req, res, next) => {
+    try {
+        const data = req.body;
+
+        const { email } = data;
+
+        const getEmailExits = await Customer.findOne({ email });
+
+        const errors = [];
+
+        if (getEmailExits) errors.push(' Email already exists');
+
+        if (errors.length > 0) {
+            return res.status(400).json({
+                message: `Adding customers failed, ${errors}`,
+            });
+        }
+
+        const newItem = new Customer(data);
+
+        let result = await newItem.save();
+
+        result.password = undefined;
+
+        return res.send(200, { statusCode: 200, message: 'success', payload: result });
+    } catch (err) {
+        console.log('««««« err »»»»»', err);
+        return res.status(500).json({ message: "Internal server error", errors: err.message });
+    }
+},
+
   update: async (req, res, next) => {
     const { id } = req.params;
     const {

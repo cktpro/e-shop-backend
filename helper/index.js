@@ -47,7 +47,25 @@ const validateSchema = (schema) => async (req, res, next) => {
       .json({ type: err.name, errors: err.errors, provider: "Yup" });
   }
 };
+
+function sortObject(obj) {
+  let sorted = {};
+  let str = [];
+  let key;
+  for (key in obj) {
+      if (obj.hasOwnProperty(key)) {
+          str.push(encodeURIComponent(key));
+      }
+  }
+  str.sort();
+  for (key = 0; key < str.length; key++) {
+      sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(/%20/g, "+");
+  }
+  return sorted;
+}
+
 module.exports = {
+  sortObject,
   writeFileSync,
   combineObjects,
   fuzzySearch,
