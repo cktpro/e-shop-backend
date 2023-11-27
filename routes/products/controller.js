@@ -13,12 +13,13 @@ const {
 module.exports = {
   getList: async (req, res, next) => {
     try {
-      const { page, pageSize, categoryId } = req.query;
+      const { page, pageSize, categoryId,supplierId } = req.query;
       const pages = page || 1;
       const limit = pageSize || 10;
       const skip = (pages - 1) * limit;
       const conditionFind = { isDeleted: false };
       if (categoryId) conditionFind.categoryId = categoryId;
+      if (supplierId) conditionFind.supplierId = supplierId;
       const result = await Product.find(conditionFind)
         .populate("image")
         .populate("category")
