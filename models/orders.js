@@ -83,6 +83,22 @@ const orderSchema = new Schema(
       //   message: `Payment type: {VALUE} is invalid!`,
       // },
     },
+    buyType: {
+      type: String,
+      required: true,
+      default: "ONLINE",
+      enum: ["ONLINE", "OFFLINE"],
+      // validate: {
+      //   validator: (value) => {
+      //     if (['CASH', 'CREDIT_CARD'].includes(value.toUpperCase())) {
+      //       return true;
+      //     }
+      //     return false;
+      //   },
+      //   message: `Payment type: {VALUE} is invalid!`,
+      // },
+    },
+
 
     status: {
       type: String,

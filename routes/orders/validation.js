@@ -51,6 +51,10 @@ const validationCreateSchema = yup.object().shape({
       .string()
       .oneOf(["CASH", "CREDIT_CARD"])
       .required(({ path }) => `${path.split(".")[1]} không được bỏ trống`),
+      buyType: yup
+      .string()
+      .oneOf(["ONLINE", "OFFLINE"])
+      .required(({ path }) => `${path.split(".")[1]} không được bỏ trống`),
     customerId: yup
       .string()
       .test("validationCustomerID", "customerId sai định dạng", (value) => {

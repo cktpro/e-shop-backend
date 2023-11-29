@@ -38,9 +38,9 @@ const addressSchema = new Schema(
     type: String,
     required: [true, "wardId is requied"],
   },
-  address: {
+  streetAddress: {
     type: String,
-    required: [true, "address is requied"],
+    required: [true, "Street address is requied"],
   },
     isDeleted: {
       type: Boolean,

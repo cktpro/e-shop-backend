@@ -21,7 +21,7 @@ const validationAddressSchema = yup.object().shape({
     districtName: yup.string().required(({ path }) => `${path.split(".")[1]} không được bỏ trống`),
     wardId:yup.string().max(50,({ path }) => `${path.split(".")[1]} quá dài`).required(({ path }) => `${path.split(".")[1]} không được bỏ trống`),
     wardName:yup.string().required(({ path }) => `${path.split(".")[1]} không được bỏ trống`),
-    address:yup.string().required(({ path }) => `${path.split(".")[1]} không được bỏ trống`),
+    streetAddress:yup.string().required(({ path }) => `${path.split(".")[1]} không được bỏ trống`),
   }),
 });
 const validationUpdateAddressSchema = yup.object().shape({
@@ -33,7 +33,7 @@ const validationUpdateAddressSchema = yup.object().shape({
     districtName: yup.string().required(({ path }) => `${path.split(".")[1]} không được bỏ trống`),
     wardId:yup.string().max(50,({ path }) => `${path.split(".")[1]} quá dài`).required(({ path }) => `${path.split(".")[1]} không được bỏ trống`),
     wardName:yup.string().required(({ path }) => `${path.split(".")[1]} không được bỏ trống`),
-    address:yup.string().required(({ path }) => `${path.split(".")[1]} không được bỏ trống`),
+    streetAddress:yup.string().required(({ path }) => `${path.split(".")[1]} không được bỏ trống`),
   }),
 });
 module.exports = {
