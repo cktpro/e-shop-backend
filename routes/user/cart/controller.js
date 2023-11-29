@@ -1,11 +1,55 @@
 const {
   Order,
   Cart,
+  Product,
+  Flashsale,
 } = require("../../../models");
 const { asyncForEach, fuzzySearch } = require("../../../helper");
 const { mongoose } = require("mongoose");
 const { array } = require("yup");
 module.exports = {
+  getListFlashsale: async (req, res, next) => {
+    try {
+      const { id } = req.user;
+      const objId = new mongoose.Types.ObjectId(id);
+
+      const result = await Cart.aggregate()
+        .match({ customerId: objId })
+        .unwind("product")
+        .lookup(
+          {
+            from: "flashsales",
+            as: "flashsales",
+            localField: "product.productId",
+            foreignField: "productId"
+          }
+        )
+        .unwind("flashsales")
+        .lookup(
+          {
+            from: "products",
+            as: "productDetail",
+            localField: "product.productId",
+            foreignField: "_id"
+          }
+        )
+        .unwind("productDetail")
+        .lookup(
+          {
+            from: "media",
+            as: "image",
+            localField: "productDetail.coverImg",
+            foreignField: "_id"
+          }
+        ).unwind("image")
+
+      return res.send(200, { statusCode: 200, payload: result })
+
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" })
+    }
+  },
+
   getList: async (req, res, next) => {
     const { id } = req.user;
     const objId = new mongoose.Types.ObjectId(id);
@@ -21,22 +65,22 @@ module.exports = {
         .unwind("product")
         .lookup(
           {
-          from:"products",
-          as:"productDetail",
-          localField:"product.productId",
-          foreignField:"_id"
+            from: "products",
+            as: "productDetail",
+            localField: "product.productId",
+            foreignField: "_id"
           }
         )
         .unwind("productDetail")
         .lookup(
           {
-          from:"media",
-          as:"image",
-          localField:"productDetail.coverImg",
-          foreignField:"_id"
+            from: "media",
+            as: "image",
+            localField: "productDetail.coverImg",
+            foreignField: "_id"
           }
         ).unwind("image")
-        
+
       // .find({customerId:id});
       if (result) {
         return res.send({
@@ -108,6 +152,7 @@ module.exports = {
     try {
       const { id } = req.user;
       const data = req.body;
+
       const exitCart = await Cart.findOne({ customerId: id });
       if (!exitCart) {
         const newRecord = new Cart({
@@ -155,6 +200,7 @@ module.exports = {
       //     );
       // });
       const exitItem = await Cart.findOne({
+        customerId: id,
         "product.productId": data.productId,
       });
       if (!exitItem) {
@@ -170,7 +216,7 @@ module.exports = {
         );
       }
 
-      const final = await Cart.findOne({customerId:id});
+      const final = await Cart.findOne({ customerId: id });
       return res.send({
         code: 203,
         message: "Tạo thành công",
@@ -191,7 +237,7 @@ module.exports = {
         { upsert: true }
       );
 
-      const final = await Cart.find({customerId:userId});
+      const final = await Cart.find({ customerId: userId });
 
       return res.send({
         code: 200,

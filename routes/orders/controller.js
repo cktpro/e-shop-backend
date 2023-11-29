@@ -1,5 +1,5 @@
-const { Order, Customer, Employee, Product } = require('../../models');
-const { asyncForEach,fuzzySearch } = require('../../helper');
+const { Order, Customer, Employee, Product, Flashsale } = require('../../models');
+const { asyncForEach, fuzzySearch } = require('../../helper');
 module.exports = {
   getList: async (req, res, next) => {
     try {
@@ -51,7 +51,7 @@ module.exports = {
   getDetail: async (req, res, next) => {
     const { id } = req.params;
     try {
-      const result = await Order.findOne({ _id: id});
+      const result = await Order.findOne({ _id: id });
       if (result) {
         return res.send({
           code: 200,
@@ -76,7 +76,7 @@ module.exports = {
       const data = req.body;
 
       const { customerId, employeeId, orderDetails } = data;
-console.log('««««« empoyeeId »»»»»', employeeId);
+      console.log('««««« empoyeeId »»»»»', employeeId);
       const getCustomer = Customer.findOne({
         _id: customerId,
         isDeleted: false,
@@ -93,7 +93,7 @@ console.log('««««« empoyeeId »»»»»', employeeId);
       ]);
 
       const errors = [];
-      if ( !customer || customer.isDelete)
+      if (!customer || customer.isDelete)
         errors.push('Khách hàng không tồn tại');
       if (employeeId && (!employee || employee.isDelete))
         errors.push('Nhân viên không tồn tại');
@@ -126,7 +126,12 @@ console.log('««««« empoyeeId »»»»»', employeeId);
         await Product.findOneAndUpdate(
           { _id: item.productId },
           { $inc: { stock: -item.quantity } }
-          );
+        );
+
+        await Flashsale.findOneAndUpdate(
+          { productId: item.productId },
+          { $inc: { stock: -item.quantity } }
+        )
       });
 
       return res.send({
@@ -139,7 +144,7 @@ console.log('««««« empoyeeId »»»»»', employeeId);
       return res.status(500).json({ code: 500, error: err });
     }
   },
-  updateStatus:async(req,res,next)=>{
+  updateStatus: async (req, res, next) => {
     try {
       const { id } = req.params;
       const { status } = req.body;
@@ -155,13 +160,13 @@ console.log('««««« empoyeeId »»»»»', employeeId);
           { status },
           { new: true },
         );
-        if(status==='CANCELED' || status==='REJECTED')
-        await asyncForEach(result.orderDetails, async (item) => {
-          await Product.findOneAndUpdate(
-            { _id: item.productId },
-            { $inc: { stock: +item.quantity } }
+        if (status === 'CANCELED' || status === 'REJECTED')
+          await asyncForEach(result.orderDetails, async (item) => {
+            await Product.findOneAndUpdate(
+              { _id: item.productId },
+              { $inc: { stock: +item.quantity } }
             );
-        });
+          });
 
         return res.send({
           code: 200,
@@ -175,7 +180,7 @@ console.log('««««« empoyeeId »»»»»', employeeId);
       return res.status(500).json({ code: 500, error: err });
     }
   },
-  updateShippedDate:async(req,res,next)=>{
+  updateShippedDate: async (req, res, next) => {
     try {
       const { id } = req.params;
       const { shippedDate } = req.body;
@@ -220,24 +225,24 @@ console.log('««««« empoyeeId »»»»»', employeeId);
           message: 'Đơn hàng không thể cập nhật',
         });
       }
-      
+
       if (checkOrder.employeeId !== employeeId) {
         const employee = await Employee.findOne({
           _id: employeeId,
           isDeleted: false,
         });
-  
+
         if (!employee) {
           return res.status(404).json({
             code: 404,
             message: 'Nhân viên không tồn tại',
           });
         }
-  
+
         const updateOrder = await Order.findByIdAndUpdate(id, { employeeId }, {
           new: true,
         });
-  
+
         if (updateOrder) {
           return res.send({
             code: 200,
@@ -245,7 +250,7 @@ console.log('««««« empoyeeId »»»»»', employeeId);
             payload: updateOrder,
           });
         }
-  
+
         return res.status(404).send({ code: 404, message: 'Không tìm thấy' });
       }
 
