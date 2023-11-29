@@ -53,7 +53,7 @@ const validationCreateSchema = yup.object().shape({
       .required(({ path }) => `${path.split(".")[1]} không được bỏ trống`),
     customerId: yup
       .string()
-      .test("validationCustomerID", "ID sai định dạng", (value) => {
+      .test("validationCustomerID", "customerId sai định dạng", (value) => {
         return ObjectId.isValid(value);
       }),
     employeeId: yup

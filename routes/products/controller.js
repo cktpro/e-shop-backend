@@ -15,7 +15,7 @@ module.exports = {
     try {
       const { page, pageSize, categoryId,supplierId } = req.query;
       const pages = page || 1;
-      const limit = pageSize || 10;
+      const limit = pageSize || 20;
       const skip = (pages - 1) * limit;
       const conditionFind = { isDeleted: false };
       if (categoryId) conditionFind.categoryId = categoryId;

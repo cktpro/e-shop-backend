@@ -5,8 +5,10 @@ const Customer = require("./customers");
 const Employee = require("./empoyees");
 const Order = require("./orders");
 const Media = require('./media');
-const Cart =require('./carts')
-const Address=require('./address')
+const Cart = require('./carts');
+const Address = require('./address');
+const Flashsale = require('./flashsale');
+const TimeFlashsale = require('./timeFlashsale');
 
 module.exports = {
   Category,
@@ -17,5 +19,7 @@ module.exports = {
   Product,
   Supplier,
   Cart,
-  Address
+  Address,
+  Flashsale,
+  TimeFlashsale,
 };
