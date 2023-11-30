@@ -18,7 +18,7 @@ const validationCreateSchema = yup.object().shape({
 
       discount: yup.number().min(0, "Discount cannot be negative").max(100, "Discount is too big").integer().required(({ path }) => `${path.split(".")[1]} is required`),
 
-      stock: yup.number().min(0, "Invalid stock").integer().required(({ path }) => `${path.split(".")[1]} is required`),
+      flashsaleStock: yup.number().min(0, "Invalid stock").integer().required(({ path }) => `${path.split(".")[1]} is required`),
     })
   ),
 });
