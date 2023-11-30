@@ -10,16 +10,12 @@ const getDetailSchema = yup.object({
 });
 
 const validationCreateSchema = yup.object().shape({
-  body: yup.array().of(
-    yup.object().shape({
-      productId: yup.string().test('validationID', 'invalid ID', (value) => {
-        return ObjectId.isValid(value);
-      }),
+  body: yup.object(
+    {
+      expirationTime: yup.date().required("expirationTime is required"),
 
-      discount: yup.number().min(0, "Discount cannot be negative").max(100, "Discount is too big").integer().required(({ path }) => `${path.split(".")[1]} is required`),
-
-      stock: yup.number().min(0, "Invalid stock").integer().required(({ path }) => `${path.split(".")[1]} is required`),
-    })
+      isOpenFlashsale: yup.boolean().required("isOpenFlashsale is required"),
+    }
   ),
 });
 

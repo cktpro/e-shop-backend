@@ -59,8 +59,8 @@ const orderSchema = new Schema(
     shippingFee:{
       type:Number,
       min:0,
-      required:true,
-      
+      required: true,
+      default: 0,
     },
     totalPrice:{
       type:Number,
@@ -102,6 +102,7 @@ const orderSchema = new Schema(
     shippingAddress: {
       type: String,
       required: [true,"Shipping address is required"],
+      default: "No Shipping",
       max: 500,
     },
     customerId: {

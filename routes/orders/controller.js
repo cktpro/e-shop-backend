@@ -130,7 +130,7 @@ module.exports = {
 
         await Flashsale.findOneAndUpdate(
           { productId: item.productId },
-          { $inc: { stock: -item.quantity } }
+          { $inc: { flashsaleStock: -item.quantity } }
         )
       });
 

@@ -10,7 +10,7 @@ const flashsaleSchema = new Schema(
       required: true,
     },
 
-    stock: {
+    flashsaleStock: {
       type: Number,
       min: 0,
       default: 0,

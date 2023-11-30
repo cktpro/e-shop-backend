@@ -26,6 +26,9 @@ const authCustomersRouter = require('./routes/authCustomer/router');
 const vnPayRouter = require('./routes/vnPay/router');
 const flashsaleRouter = require('./routes/flashsales/router');
 const timeFlashsaleRouter = require('./routes/timeFlashsales/router');
+const orderAdminRouter = require("./routes/orderAdmin/router");
+const questionAdminRouter = require("./routes/questionsAdmin/router");
+const productsAdminRouter = require("./routes/product-admin/router");
 
 const {
   passportVerifyTokenAdmin,
@@ -95,6 +98,9 @@ app.use('/authCustomers', authCustomersRouter);
 app.use('/vnPay', passport.authenticate('jwtUser', { session: false }), vnPayRouter);
 app.use('/flashsale', flashsaleRouter);
 app.use('/time-flashsale', timeFlashsaleRouter);
+app.use('/orders-admin', orderAdminRouter);
+app.use("/questions-admin", questionAdminRouter);
+app.use("/products-admin", productsAdminRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
