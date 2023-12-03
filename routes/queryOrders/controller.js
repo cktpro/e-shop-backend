@@ -21,10 +21,10 @@ module.exports = {
 
       let results = await Order.aggregate()
         .match(conditionFind)
-        .unwind({
-          path: '$orderDetails',
-          preserveNullAndEmptyArrays: true,
-        })
+        // .unwind({
+        //   path: '$orderDetails',
+        //   preserveNullAndEmptyArrays: true,
+        // })
         // .addFields({
         //   total: {
         //     $sum: {
