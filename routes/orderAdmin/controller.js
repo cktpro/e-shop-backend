@@ -220,6 +220,13 @@ module.exports = {
             model: 'categories',
           },
         })
+        .populate({
+          path: 'orderDetails.product',
+          populate: {
+            path: 'image',
+            model: 'media',
+          },
+        })
         .populate("customer")
 
       if (result) {

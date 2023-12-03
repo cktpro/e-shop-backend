@@ -24,6 +24,8 @@ module.exports = {
       let amount = parseInt(req.body.amount);
       let bankCode = req.body.bankCode;
 
+      console.log('««««« returnUrl »»»»»', returnUrl);
+
       let locale = req.body.language;
       if (locale === null || locale === '') {
         locale = 'vn';
@@ -157,10 +159,13 @@ module.exports = {
 
                   await Order.findOneAndUpdate(
                     { _id: orderIdLocal },
-                    { status: "PAID" }
+                    {
+                      status: "PAID",
+                      paymentType: "CREDIT_CARD"
+                    }
                   );
                 }
-                
+
                 res.status(200).json({ RspCode: rspCode, Message: 'Success' })
               }
               else {
