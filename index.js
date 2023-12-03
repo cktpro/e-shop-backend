@@ -23,6 +23,7 @@ var userAuth = require("./routes/user/auth/router");
 var cartRouter = require("./routes/user/cart/router")
 
 const authCustomersRouter = require('./routes/authCustomer/router');
+const authEmployeesRouter = require('./routes/authEmployee/router');
 const vnPayRouter = require('./routes/vnPay/router');
 const flashsaleRouter = require('./routes/flashsales/router');
 const timeFlashsaleRouter = require('./routes/timeFlashsales/router');
@@ -96,6 +97,7 @@ app.use("/user", userAuth);
 app.use("/cart", passport.authenticate('jwtUser', { session: false }), cartRouter);
 
 app.use('/authCustomers', authCustomersRouter);
+app.use('/authEmployees', authEmployeesRouter);
 // app.use('/vnPay', passport.authenticate('jwtUser', { session: false }), vnPayRouter);
 app.use('/vnPay', vnPayRouter);
 app.use('/flashsale', flashsaleRouter);
