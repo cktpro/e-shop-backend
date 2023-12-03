@@ -77,6 +77,9 @@ module.exports = {
     }
   },
   getQueryDateTime: (from, to, type = 'IN') => {
+    console.log('««««« from »»»»»', from);
+    console.log('««««« to »»»»»', to);
+
     fromDate = new Date(from);
   
     const tmpToDate = new Date(to);

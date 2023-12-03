@@ -29,6 +29,7 @@ const timeFlashsaleRouter = require('./routes/timeFlashsales/router');
 const orderAdminRouter = require("./routes/orderAdmin/router");
 const questionAdminRouter = require("./routes/questionsAdmin/router");
 const productsAdminRouter = require("./routes/product-admin/router");
+const queryOrderRouter = require("./routes/queryOrders/router");
 
 const {
   passportVerifyTokenAdmin,
@@ -95,12 +96,14 @@ app.use("/user", userAuth);
 app.use("/cart", passport.authenticate('jwtUser', { session: false }), cartRouter);
 
 app.use('/authCustomers', authCustomersRouter);
-app.use('/vnPay', passport.authenticate('jwtUser', { session: false }), vnPayRouter);
+// app.use('/vnPay', passport.authenticate('jwtUser', { session: false }), vnPayRouter);
+app.use('/vnPay', vnPayRouter);
 app.use('/flashsale', flashsaleRouter);
 app.use('/time-flashsale', timeFlashsaleRouter);
 app.use('/orders-admin', orderAdminRouter);
 app.use("/questions-admin", questionAdminRouter);
 app.use("/products-admin", productsAdminRouter);
+app.use("/query-orders", queryOrderRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -1072,8 +1072,10 @@ module.exports = {
 
   question23: async (req, res, next) => {
     try {
-      let { fromDate, toDate } = req.query;
-      const conditionFind = getQueryDateTime(fromDate, toDate);
+      let { startDate, endDate } = req.query;
+      const conditionFind = getQueryDateTime(startDate, endDate);
+
+      console.log('««««« conditionFind »»»»»', conditionFind.$expr.$and);
 
       let results = await Order.aggregate()
         .match(conditionFind)
@@ -1081,25 +1083,25 @@ module.exports = {
           path: '$orderDetails',
           preserveNullAndEmptyArrays: true,
         })
-        .addFields({
-          total: {
-            $sum: {
-              $divide: [
-                {
-                  $multiply: [
-                    '$orderDetails.price',
-                    { $subtract: [100, '$orderDetails.discount'] },
-                    '$orderDetails.quantity',
-                  ],
-                },
-                100,
-              ],
-            },
-          },
-        })
+        // .addFields({
+        //   total: {
+        //     $sum: {
+        //       $divide: [
+        //         {
+        //           $multiply: [
+        //             '$orderDetails.price',
+        //             { $subtract: [100, '$orderDetails.discount'] },
+        //             '$orderDetails.quantity',
+        //           ],
+        //         },
+        //         100,
+        //       ],
+        //     },
+        //   },
+        // })
         .group({
           _id: null,
-          total: { $sum: '$total' },
+          total: { $sum: '$totalPrice' },
         });
 
       let total = await Order.countDocuments();
