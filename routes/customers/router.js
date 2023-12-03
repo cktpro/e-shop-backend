@@ -3,7 +3,7 @@ var router = express.Router();
 const { validateSchema } = require('../../helper');
 const {createGoogle, getDetail,getList,search,create,update,softDelete,get_address,create_address,update_address,delete_address}=require('./controller')
 const checkIdSchema = require('../validationId')
-const {validationCreateSchema,validationAddressSchema,validationUpdateAddressSchema} =require('./validation')
+const {validationCreateSchema,validationAddressSchema,validationUpdateAddressSchema,validationUpdateSchema} =require('./validation')
 const {Authorization} =require('../../helper/jwtHelper')
 
 // GET LIST & CREATE LIST
@@ -26,7 +26,7 @@ router.get('/search',search)
 // GET DETAIL UPDATE DELETE
 router.route('/:id')
   .get(validateSchema(checkIdSchema), getDetail)
-  .put( validateSchema(checkIdSchema),validateSchema(validationCreateSchema), update)
+  .put( validateSchema(checkIdSchema),validateSchema(validationUpdateSchema), update)
 
 router.patch('/delete/:id', softDelete);
 

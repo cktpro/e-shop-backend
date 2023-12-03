@@ -4,7 +4,9 @@ const { isError } = require("util");
 module.exports = {
   getList: async (req, res, next) => {
     try {
-      const result = await Customer.find({ isDeleted: false }).populate('address').select('-password');
+      const result = await Customer.find({ isDeleted: false })
+        .populate("address")
+        .select("-password");
       if (result) {
         return res.send({
           code: 200,
@@ -25,16 +27,21 @@ module.exports = {
   },
   search: async (req, res, next) => {
     try {
-      const { name,yearOfBirthday,birthday } = req.query;
+      const { name, yearOfBirthday, birthday } = req.query;
       const conditionFind = { isDeleted: false };
       if (name) {
         {
-          conditionFind.$expr = {$or:[{firstName:fuzzySearch(name)},{lastName:fuzzySearch(name)}]};
+          conditionFind.$expr = {
+            $or: [
+              { firstName: fuzzySearch(name) },
+              { lastName: fuzzySearch(name) },
+            ],
+          };
         }
       }
-      
+
       const result = await Customer.find(conditionFind);
-      
+
       if (result) {
         return res.send({
           code: 200,
@@ -57,7 +64,10 @@ module.exports = {
   getDetail: async (req, res, next) => {
     const { id } = req.params;
     try {
-      const result = await Customer.findOne({ _id: id, isDeleted: false }).populate('address');
+      const result = await Customer.findOne({
+        _id: id,
+        isDeleted: false,
+      }).populate("address");
       if (result) {
         return res.send({
           code: 200,
@@ -110,7 +120,7 @@ module.exports = {
         mesage: "Thất bại",
       });
     } catch (err) {
-      console.log('◀◀◀ err ▶▶▶',err);
+      console.log("◀◀◀ err ▶▶▶", err);
       return res.send(400, {
         mesage: "Thất bại",
         error: err,
@@ -120,44 +130,51 @@ module.exports = {
 
   createGoogle: async (req, res, next) => {
     try {
-        const data = req.body;
+      const data = req.body;
 
-        const { email } = data;
+      const { email } = data;
 
-        const getEmailExits = await Customer.findOne({ email });
+      const getEmailExits = await Customer.findOne({ email });
 
-        const errors = [];
+      const errors = [];
 
-        if (getEmailExits) errors.push(' Email already exists');
+      if (getEmailExits) errors.push(" Email already exists");
 
-        if (errors.length > 0) {
-            return res.status(400).json({
-                message: `Adding customers failed, ${errors}`,
-            });
-        }
+      if (errors.length > 0) {
+        return res.status(400).json({
+          message: `Adding customers failed, ${errors}`,
+        });
+      }
 
-        const newItem = new Customer(data);
+      const newItem = new Customer(data);
 
-        let result = await newItem.save();
+      let result = await newItem.save();
 
-        result.password = undefined;
+      result.password = undefined;
 
-        return res.send(200, { statusCode: 200, message: 'success', payload: result });
+      return res.send(200, {
+        statusCode: 200,
+        message: "success",
+        payload: result,
+      });
     } catch (err) {
-        console.log('««««« err »»»»»', err);
-        return res.status(500).json({ message: "Internal server error", errors: err.message });
+      console.log("««««« err »»»»»", err);
+      return res
+        .status(500)
+        .json({ message: "Internal server error", errors: err.message });
     }
-},
+  },
 
   update: async (req, res, next) => {
     const { id } = req.params;
+    console.log("◀◀◀ id ▶▶▶", id);
     const {
       firstName,
       lastName,
       phoneNumber,
-      address,
+      // address,
       email,
-      password,
+      // password,
       birthday,
       isDeleted,
     } = req.body;
@@ -168,26 +185,22 @@ module.exports = {
           firstName,
           lastName,
           phoneNumber,
-          address,
+          // address,
           email,
-          password,
+          // password,
           birthday,
           isDeleted,
         },
         { new: true }
       );
-      if (result) {
-        return res.send({
-          code: 200,
-          mesage: "Thành công",
-          payload: result,
-        });
-      }
+      console.log('◀◀◀ result ▶▶▶',result);
       return res.send({
-        code: 400,
-        mesage: "Thất bại",
+        code: 200,
+        mesage: "Thành công",
+        payload: result,
       });
     } catch (err) {
+      console.log("◀◀◀ err ▶▶▶", err);
       return res.send({
         code: 400,
         mesage: "Thất bại",
@@ -225,14 +238,12 @@ module.exports = {
   get_address: async (req, res, next) => {
     const { id } = req.params;
     try {
-      const result = await Address.find(
-        { isDeleted: false},
-      );
+      const result = await Address.find({ isDeleted: false });
       if (result) {
         return res.send({
           code: 200,
           mesage: "Success",
-          payload:result
+          payload: result,
         });
       }
       return res.send({
@@ -249,23 +260,41 @@ module.exports = {
   },
   create_address: async (req, res, next) => {
     try {
-      const {customerId,provinceId,provinceName,districtId,districtName,wardId,wardName,address}=req.body
-      const exitUser= await Customer.findOne({_id:customerId,isDeleted:false})
+      const {
+        customerId,
+        provinceId,
+        provinceName,
+        districtId,
+        districtName,
+        wardId,
+        wardName,
+        streetAddress,
+      } = req.body;
+      const exitUser = await Customer.findOne({
+        _id: customerId,
+        isDeleted: false,
+      });
       if (!exitUser) {
         return res.send({
           code: 400,
           mesage: "Không tìm thấy thông tin người dùng ",
-          
         });
       }
-      const newRecord= new Address({
-        customerId,provinceId,provinceName,districtId,districtName,wardId,wardName,address
-      })
-      const result= await newRecord.save()
+      const newRecord = new Address({
+        customerId,
+        provinceId,
+        provinceName,
+        districtId,
+        districtName,
+        wardId,
+        wardName,
+        streetAddress,
+      });
+      const result = await newRecord.save();
       return res.send({
-      code: 200,
-      mesage: 'Thành công',
-      payload: result,
+        code: 200,
+        mesage: "Thành công",
+        payload: result,
       });
     } catch (err) {
       return res.send({
@@ -277,12 +306,29 @@ module.exports = {
   },
   update_address: async (req, res, next) => {
     const { id } = req.params;
-    const {provinceId,provinceName,districtId,districtName,wardId,wardName,address,isDeleted}=req.body
+    const {
+      provinceId,
+      provinceName,
+      districtId,
+      districtName,
+      wardId,
+      wardName,
+      address,
+      isDeleted,
+    } = req.body;
     try {
-      
       const result = await Address.findByIdAndUpdate(
         id,
-        {provinceId,provinceName,districtId,districtName,wardId,wardName,address,isDeleted},
+        {
+          provinceId,
+          provinceName,
+          districtId,
+          districtName,
+          wardId,
+          wardName,
+          address,
+          isDeleted,
+        },
         { new: true }
       );
       if (!result) {
@@ -294,7 +340,7 @@ module.exports = {
       return res.send({
         code: 200,
         mesage: "Success update",
-        payload:result
+        payload: result,
       });
     } catch (err) {
       return res.send({

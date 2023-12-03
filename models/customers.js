@@ -68,6 +68,7 @@ customerSchema.pre("save",async function (next) {
 });
 customerSchema.pre("findOneAndUpdate",async function (next) {
   try {
+    if(!this.getUpdate().password){next()}
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(this.getUpdate().password, salt);
     this.getUpdate().password=hash;
