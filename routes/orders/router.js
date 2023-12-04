@@ -9,7 +9,8 @@ const {
   softDelete,
   updateStatus,
   updateEmployee,
-  updateShippedDate
+  updateShippedDate,
+  getListByUser
 } = require("./controller");
 const checkIdSchema = require("../validationId");
 const { validationCreateSchema,updateStatusSchema,updateShippingDateSchema } = require("./validation");
@@ -22,6 +23,7 @@ router
   .post(validateSchema(validationCreateSchema), create);
 // SEARCH LIST
 router.get("/search", search);
+router.get("/customer", getListByUser);
 // GET DETAIL UPDATE DELETE
 router
   .route("/:id")

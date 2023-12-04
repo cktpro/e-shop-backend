@@ -313,7 +313,7 @@ module.exports = {
       districtName,
       wardId,
       wardName,
-      address,
+      streetAddress,
       isDeleted,
     } = req.body;
     try {
@@ -326,7 +326,7 @@ module.exports = {
           districtName,
           wardId,
           wardName,
-          address,
+          streetAddress,
           isDeleted,
         },
         { new: true }

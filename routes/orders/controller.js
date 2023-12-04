@@ -23,6 +23,29 @@ module.exports = {
       });
     }
   },
+  getListByUser: async (req, res, next) => {
+    const {customerId}=req.query
+    try {
+      const result = await Order.find({customerId:customerId});
+
+      if (result) {
+        return res.send({
+          code: 200,
+          mesage: "Thành công",
+          payload: result,
+        });
+      }
+      return res.send({
+        code: 404,
+        mesage: "Không tìm thấy",
+      });
+    } catch (err) {
+      return res.send({
+        code: 400,
+        mesage: "Thất bại",
+      });
+    }
+  },
   search: async (req, res, next) => {
     try {
       const { name } = req.query;
