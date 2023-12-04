@@ -118,50 +118,6 @@ module.exports = {
     }
   },
 
-  // search: async (req, res, next) => {
-  //   try {
-  //     const { name, categoryId, priceStart, priceEnd, supplierId } = req.query;
-  //     const conditionFind = { isDeleted: false };
-
-  //     if (name) conditionFind.name = fuzzySearch(name);
-
-  //     if (categoryId) {
-  //       conditionFind.categoryId = categoryId;
-  //     };
-
-  //     if (supplierId) {
-  //       conditionFind.supplierId = supplierId;
-  //     };
-
-  //     if (priceStart && priceEnd) { // 20 - 50
-  //       const compareStart = { $lte: ['$price', parseFloat(priceEnd)] }; // '$field'
-  //       const compareEnd = { $gte: ['$price', parseFloat(priceStart)] };
-  //       conditionFind.$expr = { $and: [compareStart, compareEnd] };
-  //     } else if (priceStart) {
-  //       conditionFind.price = { $gte: parseFloat(priceStart) };
-  //     } else if (priceEnd) {
-  //       conditionFind.price = { $lte: parseFloat(priceEnd) };
-  //     }
-
-  //     console.log('««««« conditionFind »»»»»', conditionFind);
-
-  //     const result = await Order.find(conditionFind)
-  //       .populate('category')
-  //       .populate('supplier');
-
-  //     res.send(200, {
-  //       message: "Tìm kiếm thành công",
-  //       payload: result,
-  //     });
-  //   } catch (err) {
-  //     console.log('««««« err »»»»»', err);
-  //     return res.send(404, {
-  //       message: "Không tìm thấy",
-  //       errors: err.message,
-  //     })
-  //   }
-  // },
-
   largeSearch: async (req, res, next) => {
     try {
       const { name, categoryId, priceStart, priceEnd, supplierId } = req.body;
@@ -412,69 +368,47 @@ module.exports = {
       const { id } = req.params;
       const dataUpdate = req.body;
 
-      // // Check if the Order exists and is not deleted
-      // const Order = await Order.findOne({ _id: id, isDeleted: false });
-
-      // console.log('««««« Order »»»»»', Order);
-
-      // if (!Order) {
-      //   return res.status(404).json({ message: `Không tìm thấy sản phẩm nào có ID: ${id}` });
-      // }
-
-      // // Check if the supplier exists and is not deleted
-      // if (Order.supplierId !== dataUpdate.supplierId) {
-      //   const supplier = await Supplier.findOne({ _id: dataUpdate.supplierId, isDeleted: false });
-
-      //   if (!supplier) {
-      //     return res.status(400).json({ message: `Supplier ${dataUpdate.supplierId} không khả dụng` });
-      //   }
-      // }
-
-      // // Check if the category exists and is not deleted
-      // if (Order.categoryId !== dataUpdate.categoryId) {
-      //   const category = await Category.findOne({ _id: dataUpdate.categoryId, isDeleted: false });
-
-      //   if (!category) {
-      //     return res.status(400).json({ message: `Category ${dataUpdate.categoryId} không khả dụng` });
-      //   }
-      // }
-
-      const findSupplier = Supplier.findOne({ _id: dataUpdate.supplierId, isDeleted: false });
-      const findCategory = Category.findOne({ _id: dataUpdate.categoryId, isDeleted: false });
-
-      const [doFindSupplier, doFindCategory] = await Promise.all([findSupplier, findCategory]);
-
-      const errors = [];
-      if (!doFindSupplier) {
-        errors.push(' Nhà cung cấp không khả dụng');
-      }
-      if (!doFindCategory) {
-        errors.push(' Danh mục không khả dụng');
-      }
-
-      if (errors.length > 0) {
-        return res.send(200, { message: `Cập nhật sản phẩm thất bại,${errors}` })
-      }
-
       // Update the Order
       const updatedOrder = await Order.findOneAndUpdate(
-        { _id: id, isDeleted: false },
+        { _id: id },
         dataUpdate,
         { new: true }
       );
 
       if (updatedOrder) {
-        return res.status(200).json({
-          message: "Cập nhật sản phẩm thành công",
-          payload: updatedOrder,
-        });
+        let result = await Order.findOne({
+          _id: id,
+        })
+          .populate({
+            path: 'orderDetails.product',
+            populate: {
+              path: 'category',
+              model: 'categories',
+            },
+          })
+          .populate({
+            path: 'orderDetails.product',
+            populate: {
+              path: 'image',
+              model: 'media',
+            },
+          })
+          .populate("customer")
+  
+        if (result) {
+          return res.send(200, { message: "Tìm kiếm thành công", payload: result });
+        }
+        // return res.status(200).json({
+        //   message: "Success",
+        //   payload: updatedOrder,
+        // });
       }
 
-      return res.status(404).json({ message: `Không tìm thấy sản phẩm có ID: ${id}` });
+      return res.status(404).json({ message: `Not found: ${id}` });
     } catch (error) {
       console.log('««««« error »»»»»', error);
       return res.send(500, {
-        message: "Có lỗi",
+        message: "Error",
         error,
       });
     }
