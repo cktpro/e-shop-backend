@@ -27,15 +27,9 @@ function generateUniqueFileName() {
   const randomChars = Math.random().toString(36).substring(2, 15);
   return `${timestamp}-${randomChars}`;
 }
-
 module.exports = {
   upload_single: (req, res, next) => {
     const { objid } = req.params;
-    console.log(
-      process.env.R2_ENDPOINT,
-      process.env.R2_ACCESS_KEY,
-      process.env.R2_SECRET_ACCESS_KEY
-    );
     upload.single("file")(req, res, async (err) => {
       try {
         const S3 = new S3Client({

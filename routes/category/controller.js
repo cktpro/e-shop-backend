@@ -93,11 +93,11 @@ module.exports = {
   },
   update: async (req, res, next) => {
     const { id } = req.params;
-    const { name, description, isDeleted } = req.body;
+    const { name, description,imageId, isDeleted } = req.body;
     try {
       const result = await Category.findOneAndUpdate(
         { _id: id, isDeleted: false },
-        { name, description, isDeleted },
+        { name, description,imageId, isDeleted },
         { new: true }
       );
       if (result) {

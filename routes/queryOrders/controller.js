@@ -59,6 +59,69 @@ module.exports = {
       return res.status(500).json({ code: 500, error: err });
     }
   },
+  getTotalOrder: async (req, res, next) => {
+    try {
+      const waiting = await Order.countDocuments({status:"WAITING"});
+      const completed = await Order.countDocuments({status:"COMPLETED"});
+      const reject = await Order.countDocuments({status:"REJECT"});
+      const canceled = await Order.countDocuments({status:"CANCELED"});
+      const paid = await Order.countDocuments({status:"PAID"});
+      const delivery = await Order.countDocuments({status:"DELIVERING"});
+      // const totalOrder={
+      //   total:total,
+      //   orderWaiting:waiting,
+      //   orderCompleted:completed,
+      //   orderReject:reject,
+      //   orderCanceled:canceled,
+      //   orderPaid:paid,
+      //   orderDelivery:delivery
+      // }
+      const totalOrder=[waiting,completed,reject,canceled,paid,delivery]
+      return res.send({
+        code: 200,
+        message:"Thành công",
+        payload: totalOrder,
+      });
+    } catch (err) {
+      console.log('««««« err »»»»»', err);
+      return res.status(500).json({ code: 500, error: err });
+    }
+  },
+  getRevenueOfYear: async (req, res, next) => {
+    try {
+      const result= await Order.aggregate().unwind("orderDetails")
+      .match({
+        status:"COMPLETED"
+      })
+      .group(
+        {
+          _id:{$month:"$createdDate"},
+          month:{$first:{$month:"$createdDate"}},
+          totalRevenue:{$sum:{$multiply:[{$divide:[{$multiply:["$orderDetails.price",{$subtract:[100,"$orderDetails.discount"]}]},100]},"$orderDetails.quantity"]}}
+          // 
+        }
+      ).sort({
+        month:1
+      })
+      // const totalOrder={
+      //   total:total,
+      //   orderWaiting:waiting,
+      //   orderCompleted:completed,
+      //   orderReject:reject,
+      //   orderCanceled:canceled,
+      //   orderPaid:paid,
+      //   orderDelivery:delivery
+      // }
+      return res.send({
+        code: 200,
+        message:"Thành công",
+        payload: result,
+      });
+    } catch (err) {
+      console.log('««««« err »»»»»', err);
+      return res.status(500).json({ code: 500, error: err });
+    }
+  },
 
   getOrder: async (req, res, next) => {
     try {

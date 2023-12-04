@@ -29,7 +29,7 @@ const validationCreateSchema = yup.object().shape({
           return false;
         }
 
-        if (value < new Date()) {
+        if (value >= new Date()) {
           return false;
         }
 
