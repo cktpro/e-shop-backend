@@ -60,6 +60,7 @@ module.exports = {
 
     try {
       const totalWaiting = await Order.countDocuments({ status: "WAITING" });
+      const totalPaid = await Order.countDocuments({ status: "PAID" });
       const totalCompleted = await Order.countDocuments({ status: "COMPLETED" });
       const totalCanceled = await Order.countDocuments({ status: "CANCELED" });
       const totalRejected = await Order.countDocuments({ status: "REJECTED" });
@@ -67,6 +68,7 @@ module.exports = {
 
       return res.send(200, {
         totalWaiting,
+        totalPaid,
         totalCompleted,
         totalCanceled,
         totalRejected,

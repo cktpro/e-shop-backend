@@ -19,7 +19,7 @@ const updateStatusSchema = yup.object({
     // }),
     status: yup.string()
       .required()
-      .oneOf(['WAITING', 'COMPLETED', 'CANCELED', 'REJECTED', 'DELIVERING'], 'Trạng thái không hợp lệ'),
+      .oneOf(['WAITING', 'PAID', 'COMPLETED', 'CANCELED', 'REJECTED', 'DELIVERING'], 'Trạng thái không hợp lệ'),
 
   }),
 });
@@ -27,7 +27,7 @@ const updateStatusSchema = yup.object({
 const getOrderListSchema = yup.object({
   query: yup.object({
     status: yup.string()
-      .oneOf(['WAITING', 'COMPLETED', 'CANCELED', 'REJECTED', 'DELIVERING'], 'Trạng thái đơn hàng không hợp lệ'),
+      .oneOf(['WAITING', 'PAID', 'COMPLETED', 'CANCELED', 'REJECTED', 'DELIVERING'], 'Trạng thái đơn hàng không hợp lệ'),
   }),
 });
 
