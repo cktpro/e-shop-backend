@@ -88,11 +88,17 @@ module.exports = {
     }
   },
   getRevenueOfYear: async (req, res, next) => {
+    const {date}=req.body
+    let yearDate;
+    if(date){yearDate=new Date(date)}
+    else{yearDate=new Date}
     try {
       const result= await Order.aggregate().unwind("orderDetails")
       .match({
-        status:"COMPLETED"
-      })
+
+        status:"COMPLETED",
+        $expr: { $eq: [ {$year:"$createdDate"} , {$year:yearDate}] }
+      } )
       .group(
         {
           _id:{$month:"$createdDate"},
@@ -122,7 +128,60 @@ module.exports = {
       return res.status(500).json({ code: 500, error: err });
     }
   },
+  getProductSold: async (req, res, next) => {
+    const {date}=req.body
+    let yearDate;
+    if(date){yearDate=new Date(date)}
+    else{yearDate=new Date}
+    try {
+      const productSold= await Order.aggregate().unwind("orderDetails")
+      .match({
 
+        status:"COMPLETED",
+        $expr: { $eq: [ {$year:"$createdDate"} , {$year:yearDate}] }
+      } )
+      .group(
+        {
+          _id:"",
+          total:{$sum:"$orderDetails.quantity"}
+          // 
+        }
+      )
+      const totalProduct= await Product.aggregate()
+      .match({
+
+        isDeleted:false,
+      } )
+      .group(
+        {
+          _id:"",
+          total:{$sum:"$stock"}
+          // 
+        }
+      )
+      const result={
+        productSold:productSold[0].total,
+        totalProduct:totalProduct[0].total,
+      }
+      // const totalOrder={
+      //   total:total,
+      //   orderWaiting:waiting,
+      //   orderCompleted:completed,
+      //   orderReject:reject,
+      //   orderCanceled:canceled,
+      //   orderPaid:paid,
+      //   orderDelivery:delivery
+      // }
+      return res.send({
+        code: 200,
+        message:"Thành công",
+        payload: result,
+      });
+    } catch (err) {
+      console.log('««««« err »»»»»', err);
+      return res.status(500).json({ code: 500, error: err });
+    }
+  },
   getOrder: async (req, res, next) => {
     try {
       let { status, startDate, endDate } = req.query;
