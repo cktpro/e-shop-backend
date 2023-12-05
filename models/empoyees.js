@@ -81,7 +81,9 @@ employeeSchema.virtual('fullName').get(function () {
     return this.firstName+" "+this.lastName;
   });
   employeeSchema.virtual('Age').get(function () {
+    if(this?.birthday)
     return new Date().getFullYear() - this.birthday.getFullYear();
+  return null
   });
   // Virtual with Populate
   

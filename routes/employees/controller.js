@@ -18,6 +18,7 @@ module.exports = {
         mesage: "Không tìm thấy",
       });
     } catch (err) {
+      console.log('◀◀◀ error ▶▶▶',err);
       return res.send({
         code: 400,
         mesage: "Thất bại",
