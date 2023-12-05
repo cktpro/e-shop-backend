@@ -96,6 +96,7 @@ customerSchema.virtual('address', {
     ref: 'address',
     localField: '_id',
     foreignField: 'customerId',
+    match:{isDeleted:false},
   });
 // Config
 customerSchema.set("toJSON", { virtuals: true });
