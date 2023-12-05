@@ -193,7 +193,7 @@ module.exports = {
         },
         { new: true }
       );
-      console.log('◀◀◀ result ▶▶▶',result);
+      console.log("◀◀◀ result ▶▶▶", result);
       return res.send({
         code: 200,
         mesage: "Thành công",
@@ -233,6 +233,56 @@ module.exports = {
         error: err,
       });
     }
+  },
+  change_password: async (req, res, next) => {
+    const { id } = req.params;
+    const { currentPassword, newPassword } = req.body;
+    try {
+      const user = await Customer.findOne({ _id: id });
+      console.log('◀◀◀ user ▶▶▶',user);
+      const isCorrectPass = await user.isValidPass(currentPassword);
+      if (!isCorrectPass) {
+        return res.status(412).json({
+          code: 412,
+          mesage: "Mật khẩu hiện tại không chính xác",
+        });
+      }
+      const result = await Customer.findOneAndUpdate({ _id: id },{password:newPassword},{new:true});
+      return res.send({
+        code: 200,
+        mesage: "Thành công",
+        payload: result,
+      });
+    } catch (error) {
+      console.log("◀◀◀ error ▶▶▶", error);
+      return res.status(500).json({
+        code: 500,
+        mesage: "Thất bại",
+        error: error,
+      });
+    }
+
+    // const { id } = req.params;
+    // try {
+    //   const result = await Address.find({ isDeleted: false });
+    //   if (result) {
+    //     return res.send({
+    //       code: 200,
+    //       mesage: "Success",
+    //       payload: result,
+    //     });
+    //   }
+    //   return res.send({
+    //     code: 404,
+    //     mesage: "Not found",
+    //   });
+    // } catch (err) {
+    //   return res.send({
+    //     code: 400,
+    //     mesage: "Error",
+    //     error: err,
+    //   });
+    // }
   },
   // Address CRUD
   get_address: async (req, res, next) => {
