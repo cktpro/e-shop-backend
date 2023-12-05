@@ -3,7 +3,7 @@ const JWT = require('jsonwebtoken');
 const jwtSettings = require('../constants/jwtSetting');
 
 const generateToken = (user) => {
-  const expiresIn = '1h';
+  const expiresIn = '30d';
   // const expiresIn = '10s';
 
   const algorithm = 'HS256';
