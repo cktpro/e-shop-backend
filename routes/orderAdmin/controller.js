@@ -202,7 +202,9 @@ module.exports = {
 
   searchCustomer: async (req, res, next) => {
     try {
-      const { phoneNumber } = req.query;
+      let { phoneNumber } = req.query;
+
+      phoneNumber = fuzzySearch(phoneNumber);
 
       console.log('««««« phoneNumber »»»»»', phoneNumber);
 
