@@ -1,9 +1,4 @@
-const {
-  Order,
-  Cart,
-  Product,
-  Flashsale,
-} = require("../../../models");
+const { Order, Cart, Product, Flashsale } = require("../../../models");
 const { asyncForEach, fuzzySearch } = require("../../../helper");
 const { mongoose } = require("mongoose");
 const { array } = require("yup");
@@ -16,37 +11,31 @@ module.exports = {
       const result = await Cart.aggregate()
         .match({ customerId: objId })
         .unwind("product")
-        .lookup(
-          {
-            from: "flashsales",
-            as: "flashsales",
-            localField: "product.productId",
-            foreignField: "productId"
-          }
-        )
+        .lookup({
+          from: "flashsales",
+          as: "flashsales",
+          localField: "product.productId",
+          foreignField: "productId",
+        })
         .unwind("flashsales")
-        .lookup(
-          {
-            from: "products",
-            as: "productDetail",
-            localField: "product.productId",
-            foreignField: "_id"
-          }
-        )
+        .lookup({
+          from: "products",
+          as: "productDetail",
+          localField: "product.productId",
+          foreignField: "_id",
+        })
         .unwind("productDetail")
-        .lookup(
-          {
-            from: "media",
-            as: "image",
-            localField: "productDetail.coverImg",
-            foreignField: "_id"
-          }
-        ).unwind("image")
+        .lookup({
+          from: "media",
+          as: "image",
+          localField: "productDetail.coverImg",
+          foreignField: "_id",
+        })
+        .unwind("image");
 
-      return res.send(200, { statusCode: 200, payload: result })
-
+      return res.send(200, { statusCode: 200, payload: result });
     } catch (error) {
-      res.status(500).json({ error: "Internal server error" })
+      res.status(500).json({ error: "Internal server error" });
     }
   },
 
@@ -63,23 +52,20 @@ module.exports = {
         //   foreignField:"_id"
         // })
         .unwind("product")
-        .lookup(
-          {
-            from: "products",
-            as: "productDetail",
-            localField: "product.productId",
-            foreignField: "_id"
-          }
-        )
+        .lookup({
+          from: "products",
+          as: "productDetail",
+          localField: "product.productId",
+          foreignField: "_id",
+        })
         .unwind("productDetail")
-        .lookup(
-          {
-            from: "media",
-            as: "image",
-            localField: "productDetail.coverImg",
-            foreignField: "_id"
-          }
-        ).unwind("image")
+        .lookup({
+          from: "media",
+          as: "image",
+          localField: "productDetail.coverImg",
+          foreignField: "_id",
+        })
+        .unwind("image");
 
       // .find({customerId:id});
       if (result) {
@@ -152,7 +138,34 @@ module.exports = {
     try {
       const { id } = req.user;
       const data = req.body;
-
+      let conditionFind = {
+        _id: data?.productId,
+        stock: { $gte: data?.quantity },
+      };
+      const productId = new mongoose.Types.ObjectId(data.productId);
+      const userId= new mongoose.Types.ObjectId(id);
+      const checkQuantity = await Cart.aggregate()
+        .unwind("product")
+        .match({
+          customerId:userId,
+          "product.productId": productId,
+        })
+        .group({
+          _id: "$product.productId",
+          quantity: { $sum: "$product.quantity" },
+        });
+        
+      if (checkQuantity.length > 0)
+        conditionFind.stock = {
+          $gt: data.quantity + checkQuantity[0].quantity,
+        };
+      const checkStock = await Product.findOne(conditionFind);
+      if (!checkStock) {
+        return res.status(412).json({
+          code: 412,
+          mesage: "Sản phẩm trong kho không đủ",
+        });
+      }
       const exitCart = await Cart.findOne({ customerId: id });
       if (!exitCart) {
         const newRecord = new Cart({
@@ -220,7 +233,7 @@ module.exports = {
       return res.send({
         code: 203,
         message: "Tạo thành công",
-        payload: final,
+        payload:final
       });
     } catch (err) {
       console.log("◀◀◀ err ▶▶▶", err);
@@ -231,6 +244,28 @@ module.exports = {
     const userId = req.user.id;
     const { productId, quantity } = req.body;
     try {
+      let conditionFind = { _id: productId, stock: { $gte: quantity } };
+      // const productIdObj = new mongoose.Types.ObjectId(productId);
+      // const checkQuantity = await Cart.aggregate()
+      //   .unwind("product")
+      //   .group({
+      //     _id: "$product.productId",
+      //     quantity: { $sum: "$product.quantity" },
+      //   })
+      //   .match({
+      //     _id: productIdObj,
+      //   });
+      // if (checkQuantity.length > 0)
+      //   conditionFind.stock = {
+      //     $gt: quantity + checkQuantity[0].quantity,
+      //   };
+      const checkStock = await Product.findOne(conditionFind);
+      if (!checkStock) {
+        return res.status(412).json({ 
+          code: 412,
+          mesage: "Sản phẩm trong kho không đủ",
+        });
+      }
       const result = await Cart.updateOne(
         { customerId: userId, "product.productId": productId },
         { $set: { "product.$.quantity": quantity } },
@@ -285,9 +320,7 @@ module.exports = {
   deleteCart: async (req, res, next) => {
     const userId = req.user.id;
     try {
-      await Cart.findOneAndDelete(
-        { customerId: userId },
-      );
+      await Cart.findOneAndDelete({ customerId: userId });
       const result2 = await Cart.find();
       //   id,
       //   { isDeleted: true },
