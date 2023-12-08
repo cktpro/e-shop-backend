@@ -270,6 +270,7 @@ module.exports = {
           _id: '$_id',
           createdDate: { $first: '$createdDate' },
           shippedDate: { $first: '$shippedDate' },
+          shippingFee: { $first: '$shippingFee' },
           paymentType: { $first: '$paymentType' },
           status: { $first: '$status' },
           customerId: { $first: '$customerId' },
